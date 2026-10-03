@@ -331,8 +331,14 @@
   <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
     <div style="flex: 1; min-width: 280px; box-sizing: border-box;">
       <label><b>Google Web App URL (Google Sheets Connector):</b></label>
-      <input type="text" id="webAppUrl" placeholder="https://script.google.com/macros/s/AKfycbzkB2UxFtXVNA8PArJyDG04YaLGB4KU79Ewa_7gYaa1cihwE6x2QTjjegh0DhHGqk03FQ/exec"  style="margin-top: 5px;">
-    </div>
+      <div>
+  <input 
+    type="text" 
+    id="webAppUrl" 
+    value="https://script.google.com/macros/s/AKfycbzkB2UxFtXVNA8PArJyDG04YaLGB4KU79Ewa_7gYaa1cihwE6x2QTjjegh0DhHGqk03FQ/exec" 
+    style="margin-top: 5px; width: 100%;"
+  >
+</div>
     <div style="flex: 1; min-width: 280px; box-sizing: border-box;">
       <label><b>Classes & Students Data (JSON Format):</b></label>
       <textarea id="classDataJson" style="height: 100px; font-family: monospace; font-size: 12px;" placeholder="Paste JSON data here..."></textarea>
