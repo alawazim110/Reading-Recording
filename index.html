@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Text Reader & Reading Assessment</title>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Canvas Confetti Library for Visual Effects -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+  :root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --success-color: #10b981;
+    --success-hover: #059669;
+    --danger-color: #ef4444;
+    --danger-hover: #dc2626;
+    --warning-color: #f59e0b;
+    --warning-hover: #d97706;
+    --info-color: #0ea5e9;
+    --info-hover: #0284c7;
+    --bg-light: #f8fafc;
+    --border-color: #e2e8f0;
+  }
+
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f1f5f9; color: #334155; }
+  textarea { width: 100%; height: 150px; font-size: 16px; padding: 12px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  
+  #controls { 
+    margin: 20px 0; 
+    background: white; 
+    padding: 20px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+  }
+  
+  #displayArea {
+    margin-top: 10px; 
+    padding: 15px; 
+    border: 1px solid var(--border-color);
+    min-height: 120px; 
+    line-height: 2; 
+    font-size: 22px; 
+    background: white; 
+    border-radius: 8px;
+    white-space: pre-wrap;
+    word-break: normal;
+    overflow-wrap: normal;
+    max-width: 100%;           
+    box-sizing: border-box;    
+  }
+
+  .sentence {
+    display: block;
+    margin-bottom: 12px;
+    cursor: pointer;
+    white-space: pre-wrap;
+  }
+
+  .sentence-item {
+    display: inline;
+    cursor: pointer;
+    margin-right: 4px;
+  }
+
+  .word {
+    padding: 2px 4px;
+    margin: 0 1px;
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+    border-radius: 4px;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .space-token {
+    white-space: pre;
+  }
+
+  #displayArea[contenteditable="true"] {
+    outline: 2px solid var(--primary-color);
+    padding: 14px;
+    white-space: pre-wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+
+  .btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  }
+
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-success { background-color: var(--success-color); }
+  .btn-success:hover { background-color: var(--success-hover); }
+  .btn-warning { background-color: var(--warning-color); color: white; }
+  .btn-warning:hover { background-color: var(--warning-hover); }
+  .btn-danger { background-color: var(--danger-color); }
+  .btn-danger:hover { background-color: var(--danger-hover); }
+  .btn-info { background-color: var(--info-color); }
+  .btn-info:hover { background-color: var(--info-hover); }
+
+  .btn-toggle {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid var(--border-color);
+  }
+  .btn-toggle.active {
+    background-color: #e0e7ff;
+    color: var(--primary-color);
+    border-color: #c7d2fe;
+  }
+
+  .btn-fmt {
+    padding: 6px 12px;
+    font-size: 14px;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    color: #334155;
+  }
+
+  .toolbar {
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 12px 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  .current-word { 
+    background-color: #fef08a !important; 
+    color: #1e293b !important;
+    box-shadow: 0 0 0 2px #facc15;
+  }
+  .current-sentence { background-color: #e0f2fe; border-radius: 4px; }
+
+  /* Syllable Colors */
+  .syllable-1 { color: #2563eb; }
+  .syllable-2 { color: #ea580c; }
+  .syllable-3 { color: #16a34a; }
+  .syllable-4 { color: #9333ea; }
+  .syllable-5 { color: #dc2626; }
+  .punctuation { color: #64748b; font-weight: bold; }
+
+  .popup {
+    position: fixed;
+    background: #0f172a;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .translate-btn {
+    position: fixed;
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  #linkContainer {
+    margin-top: 15px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #generatedLinkInput {
+    width: 60%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: #f8fafc;
+    box-sizing: border-box;
+  }
+
+  select, input[type="range"], input[type="text"], input[type="password"] {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  #webAppUrl, #assignmentTitleInput, #voiceSelect, #genderFilter {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .student-card, .teacher-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+  }
+
+  .score-badge {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50px;
+    color: white;
+    background-color: var(--primary-color);
+    margin-top: 10px;
+  }
+
+  #liveSpeechDisplay {
+    margin-top: 10px;
+    font-style: italic;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px dashed #cbd5e1;
+    min-height: 24px;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  .status-badge.online { background-color: #d1fae5; color: #065f46; }
+  .status-badge.offline { background-color: #fee2e2; color: #991b1b; }
+  .hidden { display: none !important; }
+
+  .flashcard-box {
+    background: #f1f5f9;
+    border: 2px dashed var(--primary-color);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 15px 0;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .dash-stat {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+  }
+
+  .dash-stat h4 { margin: 0 0 5px 0; font-size: 14px; color: #64748b; }
+  .dash-stat p { margin: 0; font-size: 22px; font-weight: bold; color: var(--primary-color); }
+
+  @keyframes floatStar {
+    0% { transform: translateY(0px) rotate(0deg) scale(0.5); opacity: 0; }
+    50% { opacity: 1; transform: translateY(-40px) rotate(180deg) scale(1.2); }
+    100% { transform: translateY(-80px) rotate(360deg) scale(1); opacity: 0; }
+  }
+  .floating-star {
+    position: fixed;
+    color: #f59e0b;
+    font-size: 24px;
+    animation: floatStar 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 9999;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="netStatus" class="status-badge online"><i class="fa-solid fa-wifi"></i> Online Mode</div>
+
+<h2 id="editorTitle">Text Input & Stories Library</h2>
+
+<!-- Teacher Settings -->
+<div id="teacherSetupArea" class="teacher-card">
+  <h3><i class="fa-solid fa-users-gear"></i> Teacher Settings (Classes & Google Sheets Integration)</h3>
+  <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+    <div style="flex: 1; min-width: 280px; box-sizing: border-box;">
+      <label><b>Google Web App URL (Google Sheets Connector):</b></label>
+      <input type="text" id="webAppUrl" value="https://script.google.com/macros/s/AKfycbzkB2UxFtXVNA8PArJyDG04YaLGB4KU79Ewa_7gYaa1cihwE6x2QTjjegh0DhHGqk03FQ/exec" placeholder="https://script.google.com/macros/s/.../exec" style="margin-top: 5px;">
+    </div>
+    <div style="flex: 1; min-width: 280px; box-sizing: border-box;">
+      <label><b>Classes & Students Data (JSON Format):</b></label>
+      <textarea id="classDataJson" style="height: 100px; font-family: monospace; font-size: 12px;" placeholder="Paste JSON data here..."></textarea>
+    </div>
+  </div>
+  <button id="saveTeacherSettingsBtn" class="btn btn-info" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+</div>
+
+<!-- Teacher Dashboard Statistics -->
+<div id="teacherDashboardCard" class="teacher-card" style="margin-top: 15px;">
+  <h3><i class="fa-solid fa-chart-line"></i> Teacher Performance Dashboard</h3>
+  <div class="dashboard-grid">
+    <div class="dash-stat">
+      <h4>Total Submissions</h4>
+      <p id="dashTotalSubmissions">0</p>
+    </div>
+    <div class="dash-stat">
+      <h4>Average Score</h4>
+      <p id="dashAvgScore">0%</p>
+    </div>
+    <div class="dash-stat">
+      <h4>Active Grade Level</h4>
+      <p id="dashActiveGrade">-</p>
+    </div>
+  </div>
+</div>
+
+<!-- Stories Loader Section -->
+<div id="storiesLoaderCard" class="teacher-card" style="margin-top: 15px; background: #f8fafc;">
+  <h3><i class="fa-solid fa-book-open-reader"></i> Stories Library</h3>
+  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;">
+    <select id="storyGradeFilter" style="flex: 1; min-width: 180px;" onchange="filterStoriesByGrade()">
+      <option value="">-- All Grade Levels --</option>
+      <option value="Grade 1">Grade 1 / Beginners</option>
+      <option value="Grade 2">Grade 2 / Intermediate</option>
+      <option value="Grade 3">Grade 3 / Advanced</option>
+    </select>
+    <select id="storySelect" style="flex: 2; min-width: 250px;">
+      <option value="">-- Select a story from the library --</option>
+    </select>
+    <button id="loadStoryBtn" class="btn btn-success" style="margin-bottom:0;"><i class="fa-solid fa-download"></i> Load Story</button>
+    <button id="randomStoryBtn" class="btn btn-warning" style="margin-bottom:0;"><i class="fa-solid fa-shuffle"></i> Random Story</button>
+  </div>
+</div>
+
+<!-- Assignment Title Configuration for Teacher -->
+<div id="assignmentTitleCard" class="teacher-card" style="margin-top: 15px;">
+  <label for="assignmentTitleInput"><b><i class="fa-solid fa-file-pen"></i> Assignment / Lesson Title (Unique Key):</b></label>
+  <input type="text" id="assignmentTitleInput" placeholder="e.g., Reading Assignment 1: Phonics & Vocabulary" style="margin-top: 5px;">
+</div>
+
+<textarea id="inputText" placeholder="Paste your text here..."></textarea>
+
+<!-- Student Login Portal -->
+<div id="studentLoginWrapper" class="student-card" style="display: none; max-width: 500px; margin: 20px auto;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 2.2rem; margin-bottom: 6px;">🎓</div>
+        <div id="studentAssignmentTitleDisplay" style="background: #e0e7ff; color: var(--primary-color); padding: 12px 16px; border-radius: 10px; font-weight: bold; font-size: 1.4rem; margin-bottom: 12px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.04);"></div>
+        <h4 style="color: #64748b; font-size: 0.95rem; font-weight: 600; margin: 0;">Student Portal Login</h4>
+        <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px;">Please select your details and enter your PIN</p>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="studentStageSelect">🏫 Select Grade:</label>
+            <select id="studentStageSelect" onchange="loadStudentClassesDropdown()">
+                <option value="">-- Choose Grade --</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="studentClassSelect">📚 Select Class:</label>
+            <select id="studentClassSelect" onchange="loadStudentNamesDropdown()">
+                <option value="">-- Choose Grade First --</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="studentNameSelect">👤 Select Student Name:</label>
+            <select id="studentNameSelect">
+                <option value="">-- Choose Class First --</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="studentPinInput">🔒 PIN (Last 4 digits of ID):</label>
+            <input type="password" id="studentPinInput" maxlength="4" placeholder="Enter last 4 digits">
+        </div>
+
+        <button onclick="executeStudentLogin(event)" class="btn" style="width: 100%; margin-top: 5px; justify-content: center;">Login to Activity</button>
+        <div id="studentLoginErrorMsg" style="color: var(--danger-color); font-size: 0.85rem; text-align: center; display: none; background: #fee2e2; padding: 8px; border-radius: 6px;"></div>
+    </div>
+</div>
+
+<!-- Main Application / Student Workspace -->
+<div id="mainAppContent" style="display: block;">
+
+  <!-- Audio & Reading Controls -->
+  <div id="controls">
+    <div style="margin-bottom: 15px;">
+      <label><i class="fa-solid fa-gauge-high"></i> Reading Speed:</label>
+      <input type="range" id="speedRange" min="0.3" max="2.0" step="0.1" value="0.7">
+      <span id="speedValue">0.7x</span>
+    </div>
+
+    <!-- Voice Gender & Voice Selection -->
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+      <div style="flex: 1; min-width: 150px;">
+        <label><i class="fa-solid fa-venus-mars"></i> Reader Gender:</label>
+        <select id="genderFilter" onchange="loadVoices()">
+          <option value="all">All Genders</option>
+          <option value="female">Female Voice (أنثى)</option>
+          <option value="male">Male Voice (ذكر)</option>
+        </select>
+      </div>
+      <div style="flex: 2; min-width: 250px;">
+        <label><i class="fa-solid fa-microphone"></i> Voice Selection:</label>
+        <select id="voiceSelect"></select>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label><i class="fa-solid fa-sliders"></i> Reading Mode:</label>
+      <select id="modeSelect">
+        <option value="sentence">Sentence by Sentence</option>
+        <option value="word">Word by Word</option>
+        <option value="full">Full Text</option>
+      </select>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <button id="prepareBtn" class="btn"><i class="fa-solid fa-file-code"></i> Prepare Text</button>
+      <button id="togglePlayBtn" class="btn btn-success"><i class="fa-solid fa-play"></i> Start Reading</button>
+      <button id="pauseAudioBtn" class="btn btn-warning"><i class="fa-solid fa-pause"></i> Pause Audio</button>
+      <button id="stopBtn" class="btn btn-danger"><i class="fa-solid fa-stop"></i> Stop</button>
+      <button id="flashcardModeBtn" class="btn btn-info"><i class="fa-solid fa-layer-group"></i> Word Practice (Flashcards)</button>
+    </div>
+
+    <div id="teacherLinkSection" style="margin-top: 15px;">
+      <button id="generateLinkBtn" class="btn btn-info"><i class="fa-solid fa-share-nodes"></i> Generate Student Link</button>
+      <div id="linkContainer">
+        <input type="text" id="generatedLinkInput" readonly>
+        <button id="copyBtn" class="btn btn-success"><i class="fa-regular fa-copy"></i> Copy Link</button>
+        <a id="openBtn" class="btn btn-info" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Link</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Flashcard Practice Modal / Area -->
+  <div id="flashcardArea" class="student-card" style="display: none;">
+    <h3><i class="fa-solid fa-font"></i> Word-by-Word Practice Cards</h3>
+    <div id="flashcardContent" class="flashcard-box">Click Next to Start</div>
+    <div style="text-align: center; gap: 10px; display: flex; justify-content: center;">
+      <button id="prevCardBtn" class="btn btn-toggle"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+      <button id="speakCardBtn" class="btn btn-success"><i class="fa-solid fa-volume-high"></i> Pronounce</button>
+      <button id="nextCardBtn" class="btn btn-primary"><i class="fa-solid fa-arrow-right"></i> Next Word</button>
+      <button id="closeCardBtn" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Close</button>
+    </div>
+  </div>
+
+  <h3 id="processedTextTitle">Processed Text</h3>
+
+  <!-- Teacher Toolbar -->
+  <div class="toolbar" id="teacherToolbar">
+    <div>
+      <label for="colorPicker"><i class="fa-solid fa-palette" style="color: #6366f1;"></i> Color Picker:</label>
+      <input type="color" id="colorPicker" value="#2563eb">
+    </div>
+    
+    <div style="display: flex; gap: 8px;">
+      <button id="paintBtn" class="btn btn-toggle"><i class="fa-solid fa-paint-brush"></i> Paint Mode: OFF</button>
+      <button id="editBtn" class="btn btn-toggle"><i class="fa-solid fa-pen-to-square"></i> Edit Text: OFF</button>
+    </div>
+
+    <div id="formattingControls" style="display: none; gap: 5px;">
+      <button type="button" class="btn-fmt" onclick="formatText('bold')" title="Bold"><i class="fa-solid fa-bold"></i></button>
+      <button type="button" class="btn-fmt" onclick="formatText('italic')" title="Italic"><i class="fa-solid fa-italic"></i></button>
+      <button type="button" class="btn-fmt" onclick="formatText('underline')" title="Underline"><i class="fa-solid fa-underline"></i></button>
+    </div>
+  </div>
+
+  <div id="displayArea"></div>
+
+  <!-- Student Reading Test -->
+  <div id="studentAssessmentArea" class="student-card" style="margin-top: 20px;">
+    <h3><i class="fa-solid fa-microphone-lines"></i> Student Reading Practice & Automatic Evaluation</h3>
+    <p>Click Start Reading Test to begin, use Pause/Resume as needed, and click Stop & Submit when finished to get evaluated.</p>
+    
+    <button id="startRecBtn" class="btn btn-success"><i class="fa-solid fa-microphone"></i> Start Reading Test</button>
+    <button id="pauseRecBtn" class="btn btn-warning" disabled><i class="fa-solid fa-pause"></i> Pause Recording</button>
+    <button id="stopRecBtn" class="btn btn-danger" disabled><i class="fa-solid fa-square"></i> Stop & Submit</button>
+    
+    <div id="liveSpeechDisplay">Recognized text will appear here as you read...</div>
+
+    <div id="assessmentResults" style="margin-top: 15px; display: none;">
+      <h4>Your Score:</h4>
+      <div id="scoreBadge" class="score-badge">0%</div>
+      <p id="submissionStatus" style="margin-top: 10px; font-weight: bold;"></p>
+      
+      <!-- Missed Words Section -->
+      <div id="missedWordsContainer" style="margin-top: 15px; padding: 14px; background: #fefce8; border: 1px solid #fde047; border-radius: 8px; display: none;">
+        <h5 style="color: #ca8a04; margin: 0 0 10px 0; font-size: 16px;"><i class="fa-solid fa-triangle-exclamation"></i> Missed Words (Click to hear pronunciation):</h5>
+        <div id="missedWordsList" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+      </div>
+
+      <!-- Incorrectly Pronounced Words Section -->
+      <div id="incorrectWordsContainer" style="margin-top: 15px; padding: 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; display: none;">
+        <h5 style="color: #991b1b; margin: 0 0 10px 0; font-size: 16px;"><i class="fa-solid fa-circle-xmark"></i> Incorrectly Pronounced Words (Click to hear correct pronunciation):</h5>
+        <div id="incorrectWordsList" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ------------------ ONLINE / OFFLINE ------------------ */
+const netStatus = document.getElementById("netStatus");
+
+function updateOnlineStatus() {
+  if (navigator.onLine) {
+    netStatus.className = 'status-badge online';
+    netStatus.innerHTML = '<i class="fa-solid fa-wifi"></i> Online Mode';
+  } else {
+    netStatus.className = 'status-badge offline';
+    netStatus.innerHTML = '<i class="fa-solid fa-plane"></i> Offline Mode';
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+/* ------------------ VISUAL EFFECTS (STARS & CONFETTI) ------------------ */
+function triggerSuccessConfetti() {
+  if (typeof confetti === 'function') {
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    setTimeout(() => { confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 } }); }, 250);
+    setTimeout(() => { confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 } }); }, 400);
+  }
+}
+
+function showInteractiveLoginStars(eventTarget) {
+  const rect = eventTarget ? eventTarget.getBoundingClientRect() : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  for (let i = 0; i < 12; i++) {
+    const star = document.createElement("div");
+    star.className = "floating-star";
+    star.innerHTML = '<i class="fa-solid fa-star"></i>';
+    const offsetX = (Math.random() - 0.5) * 200;
+    const offsetY = (Math.random() - 0.5) * 100;
+    star.style.left = (rect.left + (rect.width / 2) + offsetX) + "px";
+    star.style.top = (rect.top + offsetY) + "px";
+    star.style.fontSize = (Math.random() * 16 + 18) + "px";
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 1500);
+  }
+  if (typeof confetti === 'function') {
+    confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
+  }
+}
+
+/* ------------------ VARIABLES & SETUP ------------------ */
+let wordsSpans = [];
+let sentenceWordMap = [];
+let voices = [];
+let filteredVoices = [];
+let isReading = false;
+let paused = false;
+let currentIndex = 0;
+let currentSentenceIndex = 0;
+let currentMode = null;
+let activeUtterance = null;
+
+let isPaintMode = false;
+let isEditMode = false;
+
+let translateTimeout = null;
+let highlightTimeout = null;
+
+let classesData = {};
+let storiesData = [];
+let savedWebAppUrl = localStorage.getItem("webAppUrl") || "";
+
+let currentCardIndex = 0;
+
+document.getElementById("webAppUrl").value = savedWebAppUrl;
+
+/* ------------------ LOAD CLASSES DATA ------------------ */
+function loadClassesData() {
+  try {
+    const localData = localStorage.getItem("classesData");
+    if (localData) {
+      classesData = JSON.parse(localData);
+      document.getElementById("classDataJson").value = JSON.stringify(classesData, null, 2);
+      populateStagesDropdown(classesData);
+    }
+  } catch(e){}
+
+  fetch('./students_hierarchy_structured.json')
+    .then(response => {
+      if (!response.ok) throw new Error("File not found");
+      return response.json();
+    })
+    .then(data => {
+      classesData = data;
+      document.getElementById("classDataJson").value = JSON.stringify(classesData, null, 2);
+      localStorage.setItem("classesData", JSON.stringify(classesData));
+      populateStagesDropdown(classesData);
+    })
+    .catch(err => {
+      console.log("Using cached classes data from localStorage.");
+    });
+}
+
+/* ------------------ DEFAULT EXTENDED STORIES DATA ------------------ */
+const defaultStories = [
+  { grade: "Grade 1", title: "The Cat and the Hat", text: "The cat sat on the mat.\nThe cat had a big red hat.\nIt was happy." },
+  { grade: "Grade 1", title: "Sun and Sunflowers", text: "The sun is yellow.\nThe flowers grow up high to reach the light." },
+  { grade: "Grade 2", title: "My brothers", text: "My brothers are eleven and fifteen, and my sister is seven. She is very shy. and my uncle is 47." },
+  { grade: "Grade 2", title: "My School Trip", text: "Yesterday, our class went to the science museum.\nWe saw giant dinosaur fossils." },
+  { grade: "Grade 3", title: "Journey to Space", text: "Astronauts travel to outer space using powerful rockets.\nThey explore new worlds and gather samples." }
+];
+
+/* ------------------ STORIES LOADER ------------------ */
+function loadStoriesData() {
+  fetch('./story.json')
+    .then(response => {
+      if (!response.ok) throw new Error("Story file not found");
+      return response.json();
+    })
+    .then(data => {
+      storiesData = Array.isArray(data) ? data : (data.stories || defaultStories);
+      populateStoryDropdown(storiesData);
+      checkUrlParams();
+    })
+    .catch(err => {
+      storiesData = defaultStories;
+      populateStoryDropdown(storiesData);
+      checkUrlParams();
+    });
+}
+
+function populateStoryDropdown(list) {
+  const storySelect = document.getElementById("storySelect");
+  storySelect.innerHTML = '<option value="">-- Select a story from the library --</option>';
+  
+  list.forEach((story, index) => {
+    const opt = document.createElement("option");
+    opt.value = index;
+    const gradeTag = story.grade ? `[${story.grade}] ` : '';
+    opt.textContent = `${gradeTag}${story.title || story.name || `Story #${index + 1}`}`;
+    storySelect.appendChild(opt);
+  });
+}
+
+function filterStoriesByGrade() {
+  const selectedGrade = document.getElementById("storyGradeFilter").value;
+  if (!selectedGrade) {
+    populateStoryDropdown(storiesData);
+  } else {
+    const filtered = storiesData.filter(s => s.grade === selectedGrade);
+    populateStoryDropdown(filtered);
+  }
+}
+
+document.getElementById("randomStoryBtn").addEventListener("click", () => {
+  if (storiesData.length === 0) return alert("No stories loaded!");
+  const randomIndex = Math.floor(Math.random() * storiesData.length);
+  const chosen = storiesData[randomIndex];
+  const storyText = (chosen.text || chosen.content || "").replace(/\\n/g, "\n");
+  
+  document.getElementById("inputText").value = storyText;
+  document.getElementById("assignmentTitleInput").value = chosen.title || chosen.name || "";
+  prepareText(storyText);
+  alert(`Loaded Random Story: "${chosen.title}"`);
+});
+
+document.getElementById("loadStoryBtn").addEventListener("click", () => {
+  const selectedIndex = document.getElementById("storySelect").value;
+  if (selectedIndex === "") {
+    return alert("Please select a story first from the dropdown list.");
+  }
+  const chosenStory = storiesData[selectedIndex];
+  if (chosenStory) {
+    const storyText = (chosenStory.text || chosenStory.content || "").replace(/\\n/g, "\n");
+    const storyTitle = chosenStory.title || chosenStory.name || "";
+    
+    document.getElementById("inputText").value = storyText;
+    if (storyTitle) {
+      document.getElementById("assignmentTitleInput").value = storyTitle;
+    }
+    prepareText(storyText);
+    alert(`Story "${storyTitle}" loaded successfully!`);
+  }
+});
+
+document.getElementById("saveTeacherSettingsBtn").addEventListener("click", () => {
+  try {
+    classesData = JSON.parse(document.getElementById("classDataJson").value);
+    savedWebAppUrl = document.getElementById("webAppUrl").value.trim();
+    localStorage.setItem("classesData", JSON.stringify(classesData));
+    localStorage.setItem("webAppUrl", savedWebAppUrl);
+    
+    populateStagesDropdown(classesData);
+    alert("Settings saved successfully!");
+  } catch (e) {
+    alert("Invalid JSON format for class data! Please check your syntax.");
+  }
+});
+
+/* ------------------ ENHANCED SPEECH UTTERANCE CREATION ------------------ */
+function createSpeechUtterance(text) {
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = parseFloat(speedRange.value);
+  utter.volume = 1.0;
+  utter.pitch = 1.0;
+  
+  const voiceSelect = document.getElementById("voiceSelect");
+  const selectedVoiceIndex = voiceSelect.value;
+  
+  if (filteredVoices[selectedVoiceIndex]) {
+    utter.voice = filteredVoices[selectedVoiceIndex];
+    utter.lang = filteredVoices[selectedVoiceIndex].lang;
+  } else {
+    utter.lang = "en-US";
+  }
+  return utter;
+}
+
+function removeExistingButtons() {
+  document.querySelectorAll(".translate-btn").forEach(btn => btn.remove());
+  if (translateTimeout) {
+    clearTimeout(translateTimeout);
+    translateTimeout = null;
+  }
+}
+
+function clearHighlightTimeout() {
+  if (highlightTimeout) {
+    clearTimeout(highlightTimeout);
+    highlightTimeout = null;
+  }
+}
+
+function formatText(command) {
+  if (isEditMode) {
+    document.execCommand(command, false, null);
+  }
+}
+
+/* ------------------ PAINT & EDIT CONTROLS ------------------ */
+const colorPicker = document.getElementById("colorPicker");
+const paintBtn = document.getElementById("paintBtn");
+const editBtn = document.getElementById("editBtn");
+const formattingControls = document.getElementById("formattingControls");
+const inputText = document.getElementById("inputText");
+const displayArea = document.getElementById("displayArea");
+
+paintBtn.addEventListener("click", () => {
+  isPaintMode = !isPaintMode;
+  paintBtn.innerHTML = `<i class="fa-solid fa-paint-brush"></i> Paint Mode: ${isPaintMode ? 'ON' : 'OFF'}`;
+  paintBtn.classList.toggle("active", isPaintMode);
+  if (isPaintMode && isEditMode) editBtn.click();
+});
+
+editBtn.addEventListener("click", () => {
+  isEditMode = !isEditMode;
+  editBtn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Edit Text: ${isEditMode ? 'ON' : 'OFF'}`;
+  editBtn.classList.toggle("active", isEditMode);
+
+  if (isEditMode) {
+    stopAllAudio();
+    resetControls();
+    let currentRawText = "";
+    displayArea.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        currentRawText += node.textContent;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.classList && node.classList.contains('sentence')) {
+          node.childNodes.forEach(subNode => { currentRawText += subNode.textContent; });
+          currentRawText += "\n";
+        } else {
+          currentRawText += node.innerText || node.textContent;
+        }
+      }
+    });
+
+    if (!currentRawText.trim()) {
+      currentRawText = displayArea.innerText || displayArea.textContent;
+    }
+    
+    inputText.value = currentRawText;
+    displayArea.contentEditable = "true";
+    displayArea.focus();
+  } else {
+    displayArea.contentEditable = "false";
+    wordsSpans = Array.from(displayArea.querySelectorAll(".word"));
+    sentenceWordMap = [];
+    const sentenceNodes = displayArea.querySelectorAll(".sentence");
+    if (sentenceNodes.length > 0) {
+      sentenceNodes.forEach(sNode => {
+        const sWords = Array.from(sNode.querySelectorAll(".word"));
+        if (sWords.length > 0) sentenceWordMap.push(sWords);
+      });
+    } else {
+      sentenceWordMap = [wordsSpans];
+    }
+    rebindEvents();
+  }
+
+  formattingControls.style.display = isEditMode ? "flex" : "none";
+  if (isEditMode && isPaintMode) paintBtn.click();
+});
+
+function rebindEvents() {
+  const sentences = displayArea.querySelectorAll(".sentence");
+  if (sentences.length > 0) {
+    sentences.forEach(s => {
+      s.onclick = (e) => {
+        if (isPaintMode || isEditMode) return;
+        removeExistingButtons();
+        highlightSentence(s);
+        clearHighlightTimeout();
+        highlightTimeout = setTimeout(() => s.classList.remove("current-sentence"), 5000);
+
+        const sentenceText = s.innerText.trim();
+        const utter = createSpeechUtterance(sentenceText);
+        stopAllAudio();
+        activeUtterance = utter;
+        speechSynthesis.speak(utter);
+      };
+    });
+  }
+
+  wordsSpans.forEach(wordSpan => {
+    wordSpan.onclick = (e) => {
+      if (isPaintMode || isEditMode) return;
+      e.stopPropagation();
+      removeExistingButtons();
+
+      const originalWord = getOriginalWord(wordSpan);
+      highlightWord(wordSpan);
+      clearHighlightTimeout();
+      highlightTimeout = setTimeout(() => wordSpan.classList.remove("current-word"), 5000);
+
+      const utter = createSpeechUtterance(originalWord);
+      stopAllAudio();
+      activeUtterance = utter;
+      speechSynthesis.speak(utter);
+
+      showTranslateButton(wordSpan);
+    };
+
+    const syllSpans = wordSpan.querySelectorAll("span");
+    syllSpans.forEach(syllSpan => {
+      syllSpan.onclick = (e) => {
+        if (isPaintMode) {
+          e.stopPropagation();
+          syllSpan.style.color = colorPicker.value;
+        }
+      };
+    });
+  });
+}
+
+/* ------------------ TRANSLATION ------------------ */
+async function contextualTranslate(word) {
+  const clean = word.toLowerCase().replace(/[^a-z]/g, "");
+  try {
+    const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(clean)}`);
+    const data = await response.json();
+    return data[0][0][0];
+  } catch {
+    return "Translation unavailable";
+  }
+}
+
+function getOriginalWord(wordSpan) {
+  if (!wordSpan) return "";
+  let word = "";
+  const syllSpans = wordSpan.querySelectorAll("span");
+  if (syllSpans.length > 0) {
+    syllSpans.forEach(s => { word += s.textContent; });
+  } else {
+    word = wordSpan.textContent;
+  }
+  return word.trim();
+}
+
+/* ------------------ VOICES & ACCENT FILTERING ------------------ */
+function loadVoices() {
+  voices = speechSynthesis.getVoices();
+  const voiceSelect = document.getElementById("voiceSelect");
+  const genderFilter = document.getElementById("genderFilter").value;
+  if (!voiceSelect) return;
+  
+  voiceSelect.innerHTML = "";
+  filteredVoices = [];
+
+  voices.forEach((v) => {
+    const lang = v.lang ? v.lang.replace('_', '-') : '';
+    if (lang === 'en-US' || lang === 'en-GB') { 
+      const isFemale = v.name.includes("Susan") || v.name.includes("Zira") || v.name.includes("Aria") || v.name.includes("Samantha");
+      const isMale = v.name.includes("David") || v.name.includes("George") || v.name.includes("Mark") || v.name.includes("Oliver");
+      
+      if (genderFilter === "female" && !isFemale) return;
+      if (genderFilter === "male" && !isMale) return;
+      
+      filteredVoices.push(v); 
+    }
+  });
+
+  if (filteredVoices.length === 0) {
+    voices.forEach((v) => {
+      if (v.lang && v.lang.toLowerCase().startsWith('en')) { filteredVoices.push(v); }
+    });
+  }
+
+  let defaultIndex = 0;
+  filteredVoices.forEach((v, i) => {
+    const option = document.createElement("option");
+    option.value = i;
+    let accentLabel = "🇺🇸 American Accent";
+    const langCheck = v.lang ? v.lang.replace('_', '-').toLowerCase() : '';
+    if (langCheck.includes('gb') || v.name.toLowerCase().includes('uk') || v.name.toLowerCase().includes('british')) {
+      accentLabel = "🇬🇧 British Accent";
+    }
+    option.textContent = `${v.name} (${accentLabel})`;
+    voiceSelect.appendChild(option);
+  });
+
+  if (filteredVoices.length > 0) { voiceSelect.value = defaultIndex; }
+}
+
+speechSynthesis.onvoiceschanged = loadVoices;
+
+const speedRange = document.getElementById("speedRange");
+const speedValue = document.getElementById("speedValue");
+speedRange.addEventListener("input", () => { speedValue.textContent = speedRange.value + "x"; });
+
+/* ------------------ PHONETIC SYLLABIFICATION DICTIONARY ------------------ */
+function splitToSyllables(word) {
+  const trimmedWord = word.trim();
+  if (!trimmedWord) return [""];
+  
+  const cleanWord = trimmedWord.toLowerCase();
+  if (cleanWord.length <= 3) return [trimmedWord];
+
+  const dictionarySyllables = {
+    "expensive": ["ex", "pen", "sive"],
+    "apple": ["ap", "ple"],
+    "banana": ["ba", "na", "na"],
+    "cat": ["cat"],
+    "dog": ["dog"],
+    "school": ["school"],
+    "teacher": ["teach", "er"],
+    "student": ["stu", "dent"],
+    "reading": ["read", "ing"],
+    "writing": ["writ", "ing"],
+    "english": ["eng", "lish"],
+    "book": ["book"],
+    "pencil": ["pen", "cil"],
+    "computer": ["com", "pu", "ter"],
+    "classroom": ["class", "room"],
+    "learning": ["learn", "ing"],
+    "window": ["win", "dow"],
+    "yellow": ["yel", "low"],
+    "happy": ["hap", "py"],
+    "family": ["fam", "i", "ly"],
+    "water": ["wa", "ter"],
+    "mother": ["moth", "er"],
+    "father": ["fa", "ther"],
+    "brother": ["broth", "er"],
+    "sister": ["sis", "ter"],
+    "grandparent": ["grand", "pa", "rent"],
+    "grandparents": ["grand", "pa", "rents"],
+    "beautiful": ["beau", "ti", "ful"],
+    "children": ["chil", "dren"],
+    "understand": ["un", "der", "stand"],
+    "important": ["im", "por", "tant"],
+    "different": ["dif", "fer", "ent"],
+    "remember": ["re", "mem", "ber"],
+    "helpful": ["help","ful"],
+  };
+
+  if (dictionarySyllables[cleanWord]) {
+    let matchedSyllables = [...dictionarySyllables[cleanWord]];
+    if (trimmedWord[0] === trimmedWord[0].toUpperCase() && matchedSyllables.length > 0) {
+      matchedSyllables[0] = matchedSyllables[0].charAt(0).toUpperCase() + matchedSyllables[0].slice(1);
+    }
+    return matchedSyllables;
+  }
+
+  const vowels = "aeiouy";
+  let syllables = [];
+  let current = "";
+  
+  for (let i = 0; i < trimmedWord.length; i++) {
+    current += trimmedWord[i];
+    let isCurrVowel = vowels.includes(trimmedWord[i].toLowerCase());
+    let nextChar = trimmedWord[i + 1];
+    let nextNextChar = trimmedWord[i + 2];
+
+    if (isCurrVowel && nextChar && !vowels.includes(nextChar.toLowerCase()) && nextNextChar && !vowels.includes(nextNextChar.toLowerCase())) {
+      current += nextChar;
+      i++;
+      syllables.push(current);
+      current = "";
+    } 
+    else if (isCurrVowel && nextChar && !vowels.includes(nextChar.toLowerCase()) && nextNextChar && vowels.includes(nextNextChar.toLowerCase())) {
+      syllables.push(current);
+      current = "";
+    }
+  }
+
+  if (current) {
+    if (syllables.length > 0 && current.length <= 2 && !/[aeiouy]/i.test(current)) {
+      syllables[syllables.length - 1] += current;
+    } else {
+      syllables.push(current);
+    }
+  }
+
+  return syllables.length > 0 ? syllables : [trimmedWord];
+}
+
+/* ------------------ prepareText FUNCTION ------------------ */
+function prepareText(text) {
+  displayArea.innerHTML = "";
+  wordsSpans = [];
+  sentenceWordMap = [];
+  currentIndex = 0;
+  currentSentenceIndex = 0;
+  resetControls();
+
+  const lines = text.split(/\r?\n/);
+  
+  lines.forEach((line) => {
+    if (!line.trim()) {
+      const brSpan = document.createElement("div");
+      brSpan.style.height = "20px";
+      displayArea.appendChild(brSpan);
+      return;
+    }
+
+    let rawText = line;
+    let sentences = rawText.match(/[^.!?]+[.!?]+(["']|$)?/g);
+
+    if (!sentences) {
+        sentences = [rawText];
+    }
+
+    const paragraphSpan = document.createElement("div");
+    paragraphSpan.className = "sentence-line";
+    paragraphSpan.style.marginBottom = "12px";
+
+    sentences.forEach((sentenceText) => {
+      let sentenceSpan = document.createElement('span');
+      sentenceSpan.className = 'sentence sentence-item'; 
+
+      const tokens = sentenceText.split(/(\s+)/);
+      let sentenceWordsList = [];
+
+      tokens.forEach((token) => {
+        if (!token) return;
+        if (/^\s+$/.test(token)) {
+          const spaceSpan = document.createElement("span");
+          spaceSpan.textContent = token;
+          spaceSpan.className = "space-token";
+          sentenceSpan.appendChild(spaceSpan);
+          return;
+        }
+
+        const match = token.match(/^([^\w]*)([\w\-'’]+)([^\w]*)$/);
+        const wordSpan = document.createElement("span");
+        wordSpan.className = "word";
+
+        if (match) {
+          const [, prefix, coreWord, suffix] = match;
+          if (prefix) {
+            const preSpan = document.createElement("span");
+            preSpan.textContent = prefix;
+            preSpan.className = "punctuation";
+            wordSpan.appendChild(preSpan);
+          }
+
+          const syllables = splitToSyllables(coreWord);
+          syllables.forEach((syll, i) => {
+            const syllSpan = document.createElement("span");
+            syllSpan.textContent = syll;
+            syllSpan.className = "syllable-" + ((i % 5) + 1);
+            wordSpan.appendChild(syllSpan);
+          });
+
+          if (suffix) {
+            const sufSpan = document.createElement("span");
+            sufSpan.textContent = suffix;
+            sufSpan.className = "punctuation";
+            wordSpan.appendChild(sufSpan);
+          }
+        } else {
+          const fallbackSpan = document.createElement("span");
+          fallbackSpan.textContent = token;
+          fallbackSpan.className = "punctuation";
+          wordSpan.appendChild(fallbackSpan);
+        }
+
+        wordsSpans.push(wordSpan);
+        sentenceWordsList.push(wordSpan);
+        sentenceSpan.appendChild(wordSpan);
+      });
+
+      if (sentenceWordsList.length > 0) { 
+        sentenceWordMap.push(sentenceWordsList); 
+      }
+      paragraphSpan.appendChild(sentenceSpan);
+    });
+
+    displayArea.appendChild(paragraphSpan);
+  });
+
+  rebindEvents();
+}
+
+/* ------------------ FLASHCARD WORD PRACTICE MODE ------------------ */
+document.getElementById("flashcardModeBtn").addEventListener("click", () => {
+  wordsSpans = Array.from(displayArea.querySelectorAll(".word"));
+  if (wordsSpans.length === 0) return alert("Please prepare text first.");
+  currentCardIndex = 0;
+  showFlashcard(currentCardIndex);
+  document.getElementById("flashcardArea").style.display = "block";
+});
+
+function showFlashcard(index) {
+  if (index < 0 || index >= wordsSpans.length) return;
+  const wordText = getOriginalWord(wordsSpans[index]);
+  document.getElementById("flashcardContent").textContent = wordText;
+}
+
+document.getElementById("nextCardBtn").addEventListener("click", () => {
+  if (currentCardIndex < wordsSpans.length - 1) {
+    currentCardIndex++;
+    showFlashcard(currentCardIndex);
+  }
+});
+
+document.getElementById("prevCardBtn").addEventListener("click", () => {
+  if (currentCardIndex > 0) {
+    currentCardIndex--;
+    showFlashcard(currentCardIndex);
+  }
+});
+
+document.getElementById("speakCardBtn").addEventListener("click", () => {
+  const wordText = getOriginalWord(wordsSpans[currentCardIndex]);
+  const utter = createSpeechUtterance(wordText);
+  stopAllAudio();
+  speechSynthesis.speak(utter);
+});
+
+document.getElementById("closeCardBtn").addEventListener("click", () => {
+  document.getElementById("flashcardArea").style.display = "none";
+});
+
+/* ------------------ HIGHLIGHT ------------------ */
+function highlightWord(wordSpan) {
+  removeExistingButtons();
+  clearHighlightTimeout();
+  wordsSpans.forEach(w => w.classList.remove("current-word"));
+  if (wordSpan) {
+    wordSpan.classList.add("current-word");
+    wordSpan.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+}
+
+function highlightSentence(sentenceSpan) {
+  removeExistingButtons();
+  clearHighlightTimeout();
+  wordsSpans.forEach(w => w.classList.remove("current-word"));
+  document.querySelectorAll(".sentence").forEach(s => s.classList.remove("current-sentence"));
+  if (sentenceSpan) { sentenceSpan.classList.add("current-sentence"); }
+}
+
+function showTranslateButton(wordSpan) {
+  removeExistingButtons();
+  const rect = wordSpan.getBoundingClientRect();
+  const btn = document.createElement("div");
+  btn.className = "translate-btn";
+  btn.innerHTML = `<i class="fa-solid fa-language"></i> Translate`;
+  btn.style.top = (rect.top - 35) + "px";
+  btn.style.left = rect.left + "px";
+
+  btn.onclick = async () => {
+    const originalWord = getOriginalWord(wordSpan);
+    const translated = await contextualTranslate(originalWord);
+    const popup = document.createElement("div");
+    popup.className = "popup";
+    popup.textContent = translated;
+    popup.style.top = (rect.top - 65) + "px";
+    popup.style.left = rect.left + "px";
+    document.body.appendChild(popup);
+    removeExistingButtons();
+    setTimeout(() => popup.remove(), 3000);
+  };
+
+  document.body.appendChild(btn);
+  translateTimeout = setTimeout(() => { btn.remove(); }, 5000);
+}
+
+function stopAllAudio() { speechSynthesis.cancel(); }
+
+/* ------------------ READING MODES WITH SYNC BOUNDARIES ------------------ */
+function findWordSpanByCharIndex(wordsList, charIndex) {
+  let accumulatedChars = 0;
+  for (let i = 0; i < wordsList.length; i++) {
+    const w = wordsList[i];
+    const wordText = getOriginalWord(w);
+    const wordLen = wordText.length;
+    if (charIndex >= accumulatedChars && charIndex < accumulatedChars + wordLen + 1) { return w; }
+    accumulatedChars += wordLen + 1;
+  }
+  return wordsList[wordsList.length - 1];
+}
+
+function readFullMode() {
+  if (paused) return;
+  removeExistingButtons();
+  wordsSpans = Array.from(displayArea.querySelectorAll(".word"));
+  if (wordsSpans.length === 0) return;
+
+  const allText = wordsSpans.map(w => getOriginalWord(w)).join(" ");
+  const utter = createSpeechUtterance(allText);
+  stopAllAudio();
+  activeUtterance = utter;
+
+  utter.onboundary = (event) => {
+    if (event.name === 'word') {
+      const currentWordSpan = findWordSpanByCharIndex(wordsSpans, event.charIndex);
+      if (currentWordSpan) { highlightWord(currentWordSpan); }
+    }
+  };
+
+  utter.onend = () => {
+    stopAllAudio();
+    wordsSpans.forEach(w => w.classList.remove("current-word"));
+    resetControls();
+  };
+  speechSynthesis.speak(utter);
+}
+
+function readSentenceMode() {
+  if (paused || currentSentenceIndex >= sentenceWordMap.length) {
+    if (currentSentenceIndex >= sentenceWordMap.length) {
+      wordsSpans.forEach(w => w.classList.remove("current-word"));
+      document.querySelectorAll(".sentence").forEach(s => s.classList.remove("current-sentence"));
+      resetControls();
+    }
+    return;
+  }
+  removeExistingButtons();
+  const wordsInSentence = sentenceWordMap[currentSentenceIndex];
+  if (!wordsInSentence || wordsInSentence.length === 0) {
+    currentSentenceIndex++;
+    readSentenceMode();
+    return;
+  }
+  
+  const sentenceSpan = wordsInSentence[0].closest('.sentence') || wordsInSentence[0].parentElement;
+  if (sentenceSpan) highlightSentence(sentenceSpan);
+
+  const fullSentenceText = wordsInSentence.map(w => getOriginalWord(w)).join(" ");
+  const utter = createSpeechUtterance(fullSentenceText);
+  stopAllAudio();
+  activeUtterance = utter;
+
+  utter.onboundary = (event) => {
+    if (event.name === 'word') {
+      const currentWordSpan = findWordSpanByCharIndex(wordsInSentence, event.charIndex);
+      if (currentWordSpan) { highlightWord(currentWordSpan); }
+    }
+  };
+
+  utter.onend = () => {
+    if (sentenceSpan) sentenceSpan.classList.remove("current-sentence");
+    stopAllAudio();
+    if (!paused && isReading) {
+      currentSentenceIndex++;
+      readSentenceMode();
+    } else {
+      wordsSpans.forEach(w => w.classList.remove("current-word"));
+    }
+  };
+  speechSynthesis.speak(utter);
+}
+
+function readWordMode() {
+  if (paused || currentIndex >= wordsSpans.length) {
+    if (currentIndex >= wordsSpans.length) resetControls();
+    return;
+  }
+  removeExistingButtons();
+  const wordSpan = wordsSpans[currentIndex];
+  highlightWord(wordSpan);
+
+  const originalWord = getOriginalWord(wordSpan);
+  const utter = createSpeechUtterance(originalWord);
+  stopAllAudio();
+  activeUtterance = utter;
+
+  utter.onend = () => {
+    if (!paused && isReading) {
+      currentIndex++;
+      setTimeout(readWordMode, 150);
+    }
+  };
+  speechSynthesis.speak(utter);
+}
+
+function startCurrentMode() {
+  if (currentMode === "sentence") readSentenceMode();
+  else if (currentMode === "word") readWordMode();
+  else readFullMode();
+}
+
+/* ------------------ BUTTON CONTROLS ------------------ */
+const prepareBtn = document.getElementById("prepareBtn");
+const togglePlayBtn = document.getElementById("togglePlayBtn");
+const pauseAudioBtn = document.getElementById("pauseAudioBtn");
+const stopBtn = document.getElementById("stopBtn");
+const modeSelect = document.getElementById("modeSelect");
+const assignmentTitleInput = document.getElementById("assignmentTitleInput");
+const generateLinkBtn = document.getElementById("generateLinkBtn");
+const linkContainer = document.getElementById("linkContainer");
+const generatedLinkInput = document.getElementById("generatedLinkInput");
+const copyBtn = document.getElementById("copyBtn");
+const openBtn = document.getElementById("openBtn");
+
+function resetControls() {
+  isReading = false;
+  paused = false;
+  togglePlayBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start Reading`;
+  pauseAudioBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Audio`;
+  pauseAudioBtn.style.backgroundColor = "";
+}
+
+prepareBtn.addEventListener("click", () => {
+  const text = inputText.value;
+  if (!text.trim()) return alert("Please enter text first.");
+  prepareText(text);
+});
+
+togglePlayBtn.addEventListener("click", () => {
+  wordsSpans = Array.from(displayArea.querySelectorAll(".word"));
+  if (wordsSpans.length === 0) return alert("Please prepare text first.");
+
+  isReading = true;
+  paused = false;
+  currentMode = modeSelect.value;
+  currentIndex = 0;
+  currentSentenceIndex = 0;
+  togglePlayBtn.innerHTML = `<i class="fa-solid fa-play"></i> Restart Reading`;
+  pauseAudioBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Audio`;
+  pauseAudioBtn.style.backgroundColor = "";
+  
+  stopAllAudio();
+  startCurrentMode();
+});
+
+pauseAudioBtn.addEventListener("click", () => {
+  if (!isReading) return alert("Please start reading first.");
+  if (!paused) {
+    paused = true;
+    stopAllAudio();
+    pauseAudioBtn.innerHTML = `<i class="fa-solid fa-play"></i> Resume Audio`;
+    pauseAudioBtn.style.backgroundColor = "var(--success-color)";
+  } else {
+    paused = false;
+    pauseAudioBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Audio`;
+    pauseAudioBtn.style.backgroundColor = "";
+    if (currentMode === "sentence") readSentenceMode();
+    else if (currentMode === "word") readWordMode();
+    else readFullMode();
+  }
+});
+
+stopBtn.addEventListener("click", () => {
+  stopAllAudio();
+  currentIndex = 0;
+  currentSentenceIndex = 0;
+  wordsSpans.forEach(w => w.classList.remove("current-word"));
+  document.querySelectorAll(".sentence").forEach(s => s.classList.remove("current-sentence"));
+  removeExistingButtons();
+  clearHighlightTimeout();
+  resetControls();
+});
+
+/* ------------------ SHARE LINK FUNCTION ------------------ */
+function generateShareLink(storyTitle) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    return `${baseUrl}?story=${encodeURIComponent(storyTitle)}`;
+}
+
+generateLinkBtn.addEventListener("click", () => {
+  const assignmentTitle = assignmentTitleInput.value.trim();
+  if (!assignmentTitle) return alert("Please enter or select a story/assignment title first.");
+
+  const link = generateShareLink(assignmentTitle);
+  
+  generatedLinkInput.value = link;
+  openBtn.href = link;
+  linkContainer.style.display = "flex";
+});
+
+copyBtn.addEventListener("click", async () => {
+  generatedLinkInput.select();
+  try {
+    await navigator.clipboard.writeText(generatedLinkInput.value);
+    copyBtn.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+  } catch (err) {
+    document.execCommand("copy");
+    copyBtn.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+  }
+  setTimeout(() => copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy Link`, 2000);
+});
+
+/* ------------------ READ URL PARAMS ON LOAD (STUDENT MODE) ------------------ */
+function checkUrlParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const storyParam = urlParams.get('story');
+  const sharedHtml = urlParams.get('htmlContent');
+  const sharedTextLegacy = urlParams.get('text');
+
+  if (storyParam) {
+    const decodedStoryTitle = decodeURIComponent(storyParam);
+    const matchedStory = storiesData.find(s => (s.title || s.name) === decodedStoryTitle);
+    
+    if (matchedStory) {
+      const storyText = (matchedStory.text || matchedStory.content || "").replace(/\\n/g, "\n");
+      document.getElementById("inputText").value = storyText;
+      assignmentTitleInput.value = decodedStoryTitle;
+      prepareText(storyText);
+    }
+  }
+
+  if (sharedHtml || sharedTextLegacy || storyParam) {
+    const teacherSetupArea = document.getElementById("teacherSetupArea");
+    const teacherDashboardCard = document.getElementById("teacherDashboardCard");
+    const storiesLoaderCard = document.getElementById("storiesLoaderCard");
+    const assignmentTitleCard = document.getElementById("assignmentTitleCard");
+    const editorTitle = document.getElementById("editorTitle");
+    const teacherToolbar = document.getElementById("teacherToolbar");
+    const teacherLinkSection = document.getElementById("teacherLinkSection");
+    const prepareBtn = document.getElementById("prepareBtn");
+
+    if (teacherSetupArea) teacherSetupArea.style.display = "none";
+    if (teacherDashboardCard) teacherDashboardCard.style.display = "none";
+    if (storiesLoaderCard) storiesLoaderCard.style.display = "none";
+    if (assignmentTitleCard) assignmentTitleCard.style.display = "none";
+    if (editorTitle) editorTitle.style.display = "none";
+    if (inputText) inputText.style.display = "none";
+    if (teacherToolbar) teacherToolbar.style.display = "none";
+    if (teacherLinkSection) teacherLinkSection.style.display = "none";
+    if (prepareBtn) prepareBtn.style.display = "none";
+
+    const mainAppContent = document.getElementById("mainAppContent");
+    const studentLoginWrapper = document.getElementById("studentLoginWrapper");
+    const studentAssignmentTitleDisplay = document.getElementById("studentAssignmentTitleDisplay");
+
+    if (mainAppContent) mainAppContent.style.display = "none";
+    if (studentLoginWrapper) studentLoginWrapper.style.display = "block";
+
+    let titleToDisplay = storyParam ? decodeURIComponent(storyParam) : (urlParams.get('title') ? decodeURIComponent(urlParams.get('title')) : "");
+    if (titleToDisplay) {
+      studentAssignmentTitleDisplay.textContent = titleToDisplay;
+      studentAssignmentTitleDisplay.style.display = "block";
+    }
+
+    window.pendingHtmlContent = sharedHtml ? decodeURIComponent(sharedHtml) : null;
+    window.pendingLegacyText = sharedTextLegacy ? decodeURIComponent(sharedTextLegacy) : null;
+  }
+}
+
+/* ------------------ CASCADING DROPDOWNS & STUDENT LOGIN ------------------ */
+const studentStageSelect = document.getElementById("studentStageSelect");
+const studentClassSelect = document.getElementById("studentClassSelect");
+const studentNameSelect = document.getElementById("studentNameSelect");
+
+function populateStagesDropdown(data) {
+  if (!data || typeof data !== 'object') return;
+  studentStageSelect.innerHTML = '<option value="">-- Choose Grade --</option>';
+  studentClassSelect.innerHTML = '<option value="">-- Choose Grade First --</option>';
+  studentNameSelect.innerHTML = '<option value="">-- Choose Class First --</option>';
+  studentClassSelect.disabled = true;
+  studentNameSelect.disabled = true;
+
+  Object.keys(data).forEach(stageName => {
+    const opt = document.createElement("option");
+    opt.value = stageName;
+    opt.textContent = stageName;
+    studentStageSelect.appendChild(opt);
+  });
+}
+
+function loadStudentClassesDropdown() {
+  const selectedStage = studentStageSelect.value;
+  studentClassSelect.innerHTML = '<option value="">-- Choose Class --</option>';
+  studentNameSelect.innerHTML = '<option value="">-- Choose Class First --</option>';
+  studentNameSelect.disabled = true;
+
+  if (selectedStage && classesData[selectedStage]) {
+    studentClassSelect.disabled = false;
+    Object.keys(classesData[selectedStage]).forEach(secName => {
+      const opt = document.createElement("option");
+      opt.value = secName;
+      opt.textContent = "Class " + secName;
+      studentClassSelect.appendChild(opt);
+    });
+  } else {
+    studentClassSelect.disabled = true;
+  }
+}
+
+function loadStudentNamesDropdown() {
+  const selectedStage = studentStageSelect.value;
+  const selectedClass = studentClassSelect.value;
+  studentNameSelect.innerHTML = '<option value="">-- Choose Student --</option>';
+
+  if (selectedStage && selectedClass && classesData[selectedStage][selectedClass]) {
+    studentNameSelect.disabled = false;
+    classesData[selectedStage][selectedClass].forEach(studentObj => {
+      const sId = typeof studentObj === 'object' ? (studentObj.id || studentObj.student_id || studentObj["معرف الطالب"] || studentObj["اسم الطالب"]) : studentObj;
+      const sName = typeof studentObj === 'object' ? (studentObj.name || studentObj["اسم الطالب"]) : studentObj;
+      
+      const opt = document.createElement("option");
+      opt.value = sId;
+      opt.setAttribute('data-name', sName);
+      opt.textContent = sName;
+      studentNameSelect.appendChild(opt);
+    });
+  } else {
+    studentNameSelect.disabled = true;
+  }
+}
+
+let failedAttempts = 0;
+
+function executeStudentLogin(evt) {
+  const grade = studentStageSelect.value;
+  const className = studentClassSelect.value;
+  const studentId = studentNameSelect.value;
+  const pin = document.getElementById("studentPinInput").value.trim();
+  const errBox = document.getElementById("studentLoginErrorMsg");
+
+  if (failedAttempts >= 3) {
+    errBox.textContent = "Too many failed attempts. Please wait a moment.";
+    errBox.style.display = "block";
+    return;
+  }
+
+  if (!grade || !className || !studentId || !pin) {
+    errBox.textContent = "Please select all fields and enter your 4-digit PIN.";
+    errBox.style.display = "block";
+    return;
+  }
+
+  const correctPin = String(studentId).slice(-4);
+  if (pin === correctPin) {
+    failedAttempts = 0;
+    errBox.style.display = "none";
+    showInteractiveLoginStars(evt ? evt.target : null);
+    document.getElementById("studentLoginWrapper").style.display = "none";
+    
+    const mainAppContent = document.getElementById("mainAppContent");
+    if (mainAppContent) mainAppContent.style.display = "block";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const storyParam = urlParams.get('story');
+    if (storyParam) {
+      const decodedStoryTitle = decodeURIComponent(storyParam);
+      const matchedStory = storiesData.find(s => (s.title || s.name) === decodedStoryTitle);
+      if (matchedStory) {
+        const storyText = (matchedStory.text || matchedStory.content || "").replace(/\\n/g, "\n");
+        prepareText(storyText);
+      }
+    } else if (window.pendingHtmlContent) {
+      displayArea.innerHTML = window.pendingHtmlContent;
+      wordsSpans = Array.from(displayArea.querySelectorAll(".word"));
+      sentenceWordMap = [];
+      const sentenceNodes = displayArea.querySelectorAll(".sentence");
+      if (sentenceNodes.length > 0) {
+        sentenceNodes.forEach(sNode => {
+          const sWords = Array.from(sNode.querySelectorAll(".word"));
+          if (sWords.length > 0) sentenceWordMap.push(sWords);
+        });
+      } else {
+        sentenceWordMap = [wordsSpans];
+      }
+      rebindEvents();
+    } else if (window.pendingLegacyText) {
+      prepareText(window.pendingLegacyText);
+    }
+  } else {
+    failedAttempts++;
+    errBox.textContent = `Incorrect PIN. (Failed attempt ${failedAttempts} of 3)`;
+    errBox.style.display = "block";
+  }
+}
+
+/* ------------------ SPEECH RECOGNITION ------------------ */
+const startRecBtn = document.getElementById("startRecBtn");
+const pauseRecBtn = document.getElementById("pauseRecBtn");
+const stopRecBtn = document.getElementById("stopRecBtn");
+const liveSpeechDisplay = document.getElementById("liveSpeechDisplay");
+const assessmentResults = document.getElementById("assessmentResults");
+const scoreBadge = document.getElementById("scoreBadge");
+const submissionStatus = document.getElementById("submissionStatus");
+
+const missedWordsContainer = document.getElementById("missedWordsContainer");
+const missedWordsList = document.getElementById("missedWordsList");
+const incorrectWordsContainer = document.getElementById("incorrectWordsContainer");
+const incorrectWordsList = document.getElementById("incorrectWordsList");
+
+let recognition = null;
+let recognizedText = "";
+let isRecording = false;
+let isRecPaused = false;
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "en-US";
+
+  recognition.onresult = (event) => {
+    let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        recognizedText += event.results[i][0].transcript + ' ';
+      } else {
+        interimTranscript += event.results[i][0].transcript;
+      }
+    }
+    liveSpeechDisplay.textContent = recognizedText + interimTranscript;
+  };
+
+  recognition.onerror = (event) => { console.warn("Speech recognition error:", event.error); };
+  recognition.onend = () => {
+    if (isRecording && !isRecPaused) {
+      try { recognition.start(); } catch(e){}
+    }
+  };
+}
+
+startRecBtn.addEventListener("click", () => {
+  if (!studentStageSelect.value || !studentClassSelect.value || !studentNameSelect.value) {
+    return alert("Please select Grade, Class, and Student Name before starting!");
+  }
+  if (!recognition) return alert("Speech Recognition is not supported in this browser. Please use Chrome or Edge.");
+
+  recognizedText = "";
+  liveSpeechDisplay.textContent = "Listening... Speak clearly now.";
+  isRecording = true;
+  isRecPaused = false;
+
+  try {
+    recognition.start();
+    startRecBtn.disabled = true;
+    pauseRecBtn.disabled = false;
+    stopRecBtn.disabled = false;
+    assessmentResults.style.display = "none";
+  } catch(e) { console.error(e); }
+});
+
+pauseRecBtn.addEventListener("click", () => {
+  if (!recognition || !isRecording) return;
+  if (!isRecPaused) {
+    isRecPaused = true;
+    recognition.stop();
+    pauseRecBtn.innerHTML = `<i class="fa-solid fa-play"></i> Resume Recording`;
+  } else {
+    isRecPaused = false;
+    recognition.start();
+    pauseRecBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Recording`;
+  }
+});
+
+stopRecBtn.addEventListener("click", () => {
+  isRecording = false;
+  isRecPaused = false;
+  if (recognition) recognition.stop();
+
+  startRecBtn.disabled = false;
+  pauseRecBtn.disabled = true;
+  stopRecBtn.disabled = true;
+
+  let originalText = displayArea.innerText.trim() || inputText.value.trim();
+  const selectedOption = studentNameSelect.options[studentNameSelect.selectedIndex];
+  const finalStudentName = selectedOption ? selectedOption.getAttribute('data-name') : "";
+
+  setTimeout(() => {
+    evaluateAndUpload(recognizedText, originalText, `${studentStageSelect.value} - ${studentClassSelect.value}`, finalStudentName, savedWebAppUrl);
+  }, 800);
+});
+
+function normalizeNumberWords(text) {
+  if (!text) return [];
+  
+  const wordToNum = {
+    "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4",
+    "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9",
+    "ten": "10", "eleven": "11", "twelve": "12", "thirteen": "13", "fourteen": "14",
+    "fifteen": "15", "sixteen": "16", "seventeen": "17", "eighteen": "18", "nineteen": "19",
+    "twenty": "20", "thirty": "30", "forty": "40", "fifty": "50",
+    "sixty": "60", "seventy": "70", "eighty": "80", "ninety": "90"
+  };
+ 
+  let cleaned = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+  let tokens = cleaned.split(/\s+/).filter(Boolean);
+  
+  return tokens.map(token => wordToNum[token] || token);
+}
+
+/* ------------------ FUZZY MATCHING (LEVENSHTEIN DISTANCE) FOR SENSITIVITY ------------------ */
+function getLevenshteinDistance(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  let matrix = [];
+  for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+  for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+function wordsAreSimilar(w1, w2) {
+  if (w1 === w2) return true;
+  const maxLen = Math.max(w1.length, w2.length);
+  if (maxLen <= 3) {
+    return getLevenshteinDistance(w1, w2) <= 1;
+  } else if (maxLen <= 6) {
+    return getLevenshteinDistance(w1, w2) <= 2;
+  } else {
+    return getLevenshteinDistance(w1, w2) <= 3;
+  }
+}
+
+function evaluateAndCategorizeWords(spoken, original) {
+  const cleanSpokenWords = normalizeNumberWords(spoken);
+  let originalTokensList = normalizeNumberWords(original);
+
+  let matchedCount = 0;
+  
+  let remainingSpoken = [...cleanSpokenWords];
+  let tempOriginals = [];
+
+  originalTokensList.forEach((origWord) => {
+    const indexInSpoken = remainingSpoken.indexOf(origWord);
+    if (indexInSpoken !== -1) {
+      matchedCount++;
+      remainingSpoken.splice(indexInSpoken, 1);
+    } else {
+      tempOriginals.push(origWord);
+    }
+  });
+
+  let finalUnmatched = [];
+  tempOriginals.forEach((origWord) => {
+    let foundFuzzyIndex = -1;
+    for (let i = 0; i < remainingSpoken.length; i++) {
+      if (wordsAreSimilar(origWord, remainingSpoken[i])) {
+        foundFuzzyIndex = i;
+        break;
+      }
+    }
+    if (foundFuzzyIndex !== -1) {
+      matchedCount++;
+      remainingSpoken.splice(foundFuzzyIndex, 1);
+    } else {
+      finalUnmatched.push(origWord);
+    }
+  });
+
+  let finalIncorrectWords = [];
+  let finalMissingWords = [];
+
+  finalUnmatched.forEach((word) => {
+    if (remainingSpoken.length > 0) {
+      remainingSpoken.shift();
+      if (!finalIncorrectWords.includes(word)) { finalIncorrectWords.push(word); }
+    } else {
+      if (!finalMissingWords.includes(word)) { finalMissingWords.push(word); }
+    }
+  });
+
+  let score = originalTokensList.length > 0 ? Math.round((matchedCount / originalTokensList.length) * 100) : 0;
+  score = Math.min(100, Math.max(0, score));
+  return { score, missed: finalMissingWords, incorrect: finalIncorrectWords };
+}
+
+function updateTeacherStats(score) {
+  let count = parseInt(localStorage.getItem("totalSubmissions") || "0") + 1;
+  let totalScoreSum = parseInt(localStorage.getItem("totalScoreSum") || "0") + score;
+  
+  localStorage.setItem("totalSubmissions", count);
+  localStorage.setItem("totalScoreSum", totalScoreSum);
+
+  document.getElementById("dashTotalSubmissions").textContent = count;
+  document.getElementById("dashAvgScore").textContent = Math.round(totalScoreSum / count) + "%";
+  document.getElementById("dashActiveGrade").textContent = studentStageSelect.value || "-";
+}
+
+function evaluateAndUpload(spoken, original, className, studentName, appUrl) {
+  const evaluation = evaluateAndCategorizeWords(spoken, original);
+  const score = evaluation.score;
+  const missedWords = evaluation.missed;
+  const incorrectWords = evaluation.incorrect;
+  
+  assessmentResults.style.display = "block";
+  scoreBadge.textContent = score + "%";
+
+  if (score >= 80) scoreBadge.style.backgroundColor = "var(--success-color)";
+  else if (score >= 50) scoreBadge.style.backgroundColor = "var(--info-color)";
+  else scoreBadge.style.backgroundColor = "var(--danger-color)";
+
+  missedWordsList.innerHTML = "";
+  if (missedWords.length > 0) {
+    missedWordsContainer.style.display = "block";
+    missedWords.forEach(w => {
+      const tag = document.createElement("span");
+      tag.style.background = "#fefce8";
+      tag.style.color = "#ca8a04";
+      tag.style.padding = "8px 16px";
+      tag.style.borderRadius = "8px";
+      tag.style.fontSize = "18px";
+      tag.style.fontWeight = "bold";
+      tag.style.border = "2px solid #fde047";
+      tag.style.cursor = "pointer";
+      tag.style.display = "inline-flex";
+      tag.style.alignItems = "center";
+      tag.style.gap = "8px";
+      tag.innerHTML = `<i class="fa-solid fa-volume-high"></i> ${w}`;
+      tag.onclick = () => {
+        const utter = createSpeechUtterance(w);
+        speechSynthesis.speak(utter);
+      };
+      missedWordsList.appendChild(tag);
+    });
+  } else {
+    missedWordsContainer.style.display = "none";
+  }
+
+  incorrectWordsList.innerHTML = "";
+  if (incorrectWords.length > 0) {
+    incorrectWordsContainer.style.display = "block";
+    incorrectWords.forEach(w => {
+      const tag = document.createElement("span");
+      tag.style.background = "#fef2f2";
+      tag.style.color = "#991b1b";
+      tag.style.padding = "8px 16px";
+      tag.style.borderRadius = "8px";
+      tag.style.fontSize = "18px";
+      tag.style.fontWeight = "bold";
+      tag.style.border = "2px solid #fecaca";
+      tag.style.cursor = "pointer";
+      tag.style.display = "inline-flex";
+      tag.style.alignItems = "center";
+      tag.style.gap = "8px";
+      tag.innerHTML = `<i class="fa-solid fa-volume-high"></i> ${w}`;
+      tag.onclick = () => {
+        const utter = createSpeechUtterance(w);
+        speechSynthesis.speak(utter);
+      };
+      incorrectWordsList.appendChild(tag);
+    });
+  } else {
+    incorrectWordsContainer.style.display = "none";
+  }
+
+  if (score >= 80) triggerSuccessConfetti();
+  updateTeacherStats(score);
+
+  if (!appUrl) {
+    submissionStatus.textContent = "Evaluated successfully! (Google Sheet URL not configured).";
+    submissionStatus.style.color = "var(--warning-color)";
+    return;
+  }
+
+  submissionStatus.textContent = "Submitting score to teacher sheet...";
+  submissionStatus.style.color = "var(--info-color)";
+
+  const payload = {
+    studentName: studentName || "Unknown Student",
+    className: className || "General",
+    score: score,
+    assignment: assignmentTitleInput.value || "Reading Activity",
+    missedWords: missedWords.join(", "),
+    incorrectWords: incorrectWords.join(", ")
+  };
+
+  fetch(appUrl, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    submissionStatus.textContent = "Score submitted successfully to Google Sheets!";
+    submissionStatus.style.color = "var(--success-color)";
+  }).catch(err => {
+    submissionStatus.textContent = "Evaluated successfully! (Network error submitting to sheet).";
+    submissionStatus.style.color = "var(--danger-color)";
+  });
+}
+
+/* ------------------ INITIALIZATION ------------------ */
+window.addEventListener("DOMContentLoaded", () => {
+  loadClassesData();
+  loadStoriesData();
+  loadVoices();
+});
+</script>
+
+</body>
+</html>
