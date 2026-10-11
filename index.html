@@ -669,20 +669,30 @@
 </div>
 
 <script>
-/* ------------------ قاموس المقاطع الصوتية الأكاديمي الدقيق (نظيف تماماً وخالٍ من رموز البدائل) ------------------ */
+/* ------------------ القاموس الشامل والدقيق للمقاطع الصوتية (Dictionary-Based Syllabification) ------------------ */
 const masterPhonicsDictionary = {
-  "expensive": ["ex", "pen", "sive"],
-  "apple": ["ap", "ple"],
-  "banana": ["ba", "na", "na"],
-  "cat": ["cat"],
-  "dog": ["dog"],
-  "school": ["school"],
+  "brother": ["broth", "er"],
+  "brothers": ["broth", "ers"],
+  "grandparents": ["grand", "pa", "rents"],
+  "grandparent": ["grand", "pa", "rent"],
+  "grandfather": ["grand", "fa", "ther"],
+  "grandmother": ["grand", "moth", "er"],
   "teacher": ["teach", "er"],
   "student": ["stu", "dent"],
   "reading": ["read", "ing"],
   "writing": ["writ", "ing"],
   "english": ["eng", "lish"],
-  "book": ["book"],
+  "school": ["school"],
+  "mother": ["moth", "er"],
+  "father": ["fa", "ther"],
+  "sister": ["sis", "ter"],
+  "family": ["fam", "i", "ly"],
+  "water": ["wa", "ter"],
+  "expensive": ["ex", "pen", "sive"],
+  "apple": ["ap", "ple"],
+  "banana": ["ba", "na", "na"],
+  "cat": ["cat"],
+  "dog": ["dog"],
   "pencil": ["pen", "cil"],
   "computer": ["com", "pu", "ter"],
   "classroom": ["class", "room"],
@@ -690,15 +700,6 @@ const masterPhonicsDictionary = {
   "window": ["win", "dow"],
   "yellow": ["yel", "low"],
   "happy": ["hap", "py"],
-  "family": ["fam", "i", "ly"],
-  "water": ["wa", "ter"],
-  "mother": ["moth", "er"],
-  "father": ["fa", "ther"],
-  "brother": ["broth", "er"],
-  "sister": ["sis", "ter"],
-  "grandparent": ["grand", "pa", "rent"],
-  "grandparents": ["grand", "pa", "rents"],
-  "beautiful": ["beau", "ti", "ful"],
   "children": ["chil", "dren"],
   "understand": ["un", "der", "stand"],
   "important": ["im", "por", "tant"],
@@ -717,50 +718,40 @@ const masterPhonicsDictionary = {
   "yesterday": ["yes", "ter", "day"],
   "science": ["sci", "ence"],
   "giant": ["gi", "ant"],
-  "table": ["ta", "ble"],
+  "adventure": ["ad", "ven", "ture"],
+  "beautiful": ["beau", "ti", "ful"],
+  "wonderful": ["won", "der", "ful"],
+  "fantastic": ["fan", "tas", "tic"],
+  "amazing": ["a", "maz", "ing"],
+  "delicious": ["de", "li", "cious"],
+  "chocolate": ["cho", "co", "late"],
+  "strawberry": ["straw", "ber", "ry"],
+  "pineapple": ["pine", "ap", "ple"],
+  "watermelon": ["wa", "ter", "mel", "on"],
+  "grapefruit": ["grape", "fruit"],
+  "table": ["ta", "ble"]
 };
 
-// دالة تقطيع نظيفة وآمنة تماماً تمنع ظهور أي رموز مؤقتة
+// دالة تقطيع تعتمد بالكامل على القاموس أولاً لتجنب الأخطاء، مع خوارزمية احتياطية ذكية
 function splitToSyllables(word) {
   const trimmedWord = word.trim();
   if (!trimmedWord) return [""];
   
   const cleanWord = trimmedWord.toLowerCase().replace(/[^a-z]/g, "");
-  if (cleanWord.length <= 3) return [trimmedWord];
-
-  // القاموس الأكاديمي المباشر للكلمات التي تحتاج تقطيعاً دقيقاً مسبق الضبط
- const localPhonicsDict = {
-        "grandparents": ["grand", "pa", "rents"],
-        "grandfather": ["grand", "fa", "ther"],
-        "grandmother": ["grand", "moth", "er"],
-        "brother": ["broth", "er"],
-        "brothers": ["broth", "ers"],
-        "teacher": ["teach", "er"],
-        "student": ["stu", "dent"],
-        "reading": ["read", "ing"],
-        "writing": ["writ", "ing"],
-        "english": ["eng", "lish"],
-        "school": ["school"],
-        "mother": ["moth", "er"],
-        "father": ["fa", "ther"],
-        "sister": ["sis", "ter"],
-        "family": ["fam", "i", "ly"],
-        "water": ["wa", "ter"],
-        "children": ["chil", "dren"],
-        "eleven": ["e", "lev", "en"],
-        "fifteen": ["fif", "teen"],
-        "seven": ["sev", "en"]
-      };
-
-  if (localPhonicsDict[cleanWord]) {
-    let matchedSyllables = [...localPhonicsDict[cleanWord]];
+  
+  // 1. الفحص المباشر في القاموس الدقيق (وهو الأساس لمنع الأخطاء تماماً)
+  if (masterPhonicsDictionary[cleanWord]) {
+    let matchedSyllables = [...masterPhonicsDictionary[cleanWord]];
     if (trimmedWord[0] === trimmedWord[0].toUpperCase() && matchedSyllables.length > 0) {
-      matchedSyllables[0] = matchedSyllables[0].charAt(0).toUpperCase() + matchedSyllables[0].slice(1);
+      matchedSyllables[0] = matchedSyllables.charAt(0).toUpperCase() + matchedSyllables[0].slice(1);
     }
     return matchedSyllables;
   }
 
-  // الخوارزمية القياسية للكلمات الأخرى
+  // كلمات قصيرة لا تحتاج تقطيع
+  if (cleanWord.length <= 3) return [trimmedWord];
+
+  // 2. خوارزمية ذكية مقسمة مقاطع لغوياً (تقسيم بين الحروف الساكنة والمتحركة)
   const vowels = "aeiouy";
   let internalSyllables = [];
   let current = "";
@@ -2226,7 +2217,7 @@ async function evaluateAndSaveResult(spoken, original, className, studentName) {
     missedWordsContainer.style.display = "none";
   }
 
-  // Display Incorrect Words
+  // Display IncorrectWords
   incorrectWordsList.innerHTML = "";
   if (incorrectWords.length > 0) {
     incorrectWordsContainer.style.display = "block";
@@ -2268,7 +2259,6 @@ async function evaluateAndSaveResult(spoken, original, className, studentName) {
 document.addEventListener("DOMContentLoaded", function() {
   loadClassesData();
   
-  // تحميل إحصائيات لوحة التحكم المخزنة مسبقاً فور فتح الصفحة
   let count = localStorage.getItem("totalSubmissions") || "0";
   let totalScoreSum = localStorage.getItem("totalScoreSum") || "0";
   
