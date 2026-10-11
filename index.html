@@ -669,6 +669,134 @@
 </div>
 
 <script>
+/* ------------------ قاموس المقاطع الصوتية الأكاديمي الدقيق (نظيف تماماً وخالٍ من رموز البدائل) ------------------ */
+const masterPhonicsDictionary = {
+  "expensive": ["ex", "pen", "sive"],
+  "apple": ["ap", "ple"],
+  "banana": ["ba", "na", "na"],
+  "cat": ["cat"],
+  "dog": ["dog"],
+  "school": ["school"],
+  "teacher": ["teach", "er"],
+  "student": ["stu", "dent"],
+  "reading": ["read", "ing"],
+  "writing": ["writ", "ing"],
+  "english": ["eng", "lish"],
+  "book": ["book"],
+  "pencil": ["pen", "cil"],
+  "computer": ["com", "pu", "ter"],
+  "classroom": ["class", "room"],
+  "learning": ["learn", "ing"],
+  "window": ["win", "dow"],
+  "yellow": ["yel", "low"],
+  "happy": ["hap", "py"],
+  "family": ["fam", "i", "ly"],
+  "water": ["wa", "ter"],
+  "mother": ["moth", "er"],
+  "father": ["fa", "ther"],
+  "brother": ["broth", "er"],
+  "sister": ["sis", "ter"],
+  "grandparent": ["grand", "pa", "rent"],
+  "grandparents": ["grand", "pa", "rents"],
+  "beautiful": ["beau", "ti", "ful"],
+  "children": ["chil", "dren"],
+  "understand": ["un", "der", "stand"],
+  "important": ["im", "por", "tant"],
+  "different": ["dif", "fer", "ent"],
+  "remember": ["re", "mem", "ber"],
+  "helpful": ["help", "ful"],
+  "eleven": ["e", "lev", "en"],
+  "fifteen": ["fif", "teen"],
+  "seven": ["sev", "en"],
+  "museum": ["mu", "se", "um"],
+  "dinosaurs": ["di", "no", "saurs"],
+  "fossils": ["fos", "sils"],
+  "astronauts": ["as", "tro", "nauts"],
+  "rockets": ["rock", "ets"],
+  "explore": ["ex", "plore"],
+  "yesterday": ["yes", "ter", "day"],
+  "science": ["sci", "ence"],
+  "giant": ["gi", "ant"]
+};
+
+// دالة تقطيع نظيفة وآمنة تماماً تمنع ظهور أي رموز مؤقتة
+function splitToSyllables(word) {
+  const trimmedWord = word.trim();
+  if (!trimmedWord) return [""];
+  
+  const cleanWord = trimmedWord.toLowerCase().replace(/[^a-z]/g, "");
+  if (cleanWord.length <= 3) return [trimmedWord];
+
+  // القاموس الأكاديمي المباشر للكلمات التي تحتاج تقطيعاً دقيقاً مسبق الضبط
+ const localPhonicsDict = {
+        "grandparents": ["grand", "pa", "rents"],
+        "grandfather": ["grand", "fa", "ther"],
+        "grandmother": ["grand", "moth", "er"],
+        "brother": ["broth", "er"],
+        "brothers": ["broth", "ers"],
+        "teacher": ["teach", "er"],
+        "student": ["stu", "dent"],
+        "reading": ["read", "ing"],
+        "writing": ["writ", "ing"],
+        "english": ["eng", "lish"],
+        "school": ["school"],
+        "mother": ["moth", "er"],
+        "father": ["fa", "ther"],
+        "sister": ["sis", "ter"],
+        "family": ["fam", "i", "ly"],
+        "water": ["wa", "ter"],
+        "children": ["chil", "dren"],
+        "eleven": ["e", "lev", "en"],
+        "fifteen": ["fif", "teen"],
+        "seven": ["sev", "en"]
+      };
+
+  if (localPhonicsDict[cleanWord]) {
+    let matchedSyllables = [...localPhonicsDict[cleanWord]];
+    if (trimmedWord[0] === trimmedWord[0].toUpperCase() && matchedSyllables.length > 0) {
+      matchedSyllables[0] = matchedSyllables[0].charAt(0).toUpperCase() + matchedSyllables[0].slice(1);
+    }
+    return matchedSyllables;
+  }
+
+  // الخوارزمية القياسية للكلمات الأخرى
+  const vowels = "aeiouy";
+  let internalSyllables = [];
+  let current = "";
+  
+  for (let i = 0; i < cleanWord.length; i++) {
+    current += cleanWord[i];
+    let isCurrVowel = vowels.includes(cleanWord[i]);
+    let nextChar = cleanWord[i + 1];
+    let nextNextChar = cleanWord[i + 2];
+
+    if (isCurrVowel && nextChar && !vowels.includes(nextChar) && nextNextChar && !vowels.includes(nextNextChar)) {
+      current += nextChar;
+      i++;
+      internalSyllables.push(current);
+      current = "";
+    } 
+    else if (isCurrVowel && nextChar && !vowels.includes(nextChar) && nextNextChar && vowels.includes(nextNextChar)) {
+      internalSyllables.push(current);
+      current = "";
+    }
+  }
+
+  if (current) {
+    if (internalSyllables.length > 0 && current.length <= 2 && !/[aeiouy]/.test(current)) {
+      internalSyllables[internalSyllables.length - 1] += current;
+    } else {
+      internalSyllables.push(current);
+    }
+  }
+
+  if (trimmedWord[0] === trimmedWord[0].toUpperCase() && internalSyllables.length > 0) {
+    internalSyllables[0] = internalSyllables[0].charAt(0).toUpperCase() + internalSyllables[0].slice(1);
+  }
+
+  return internalSyllables.length > 0 ? internalSyllables : [trimmedWord];
+}
+
 // Send student score to JSONBin
 async function sendScoreToNetlify(studentName, nationalId, score) {
   const JSONBIN_BIN_ID = '6ac9f3c3ffd5d160535e6864';
@@ -1144,92 +1272,6 @@ const speedRange = document.getElementById("speedRange");
 const speedValue = document.getElementById("speedValue");
 speedRange.addEventListener("input", () => { speedValue.textContent = speedRange.value + "x"; });
 
-/* ------------------ PHONETIC SYLLABIFICATION DICTIONARY ------------------ */
-function splitToSyllables(word) {
-  const trimmedWord = word.trim();
-  if (!trimmedWord) return [""];
-  
-  const cleanWord = trimmedWord.toLowerCase();
-  if (cleanWord.length <= 3) return [trimmedWord];
-
-  const dictionarySyllables = {
-    "expensive": ["ex", "pen", "sive"],
-    "apple": ["ap", "ple"],
-    "banana": ["ba", "na", "na"],
-    "cat": ["cat"],
-    "dog": ["dog"],
-    "school": ["school"],
-    "teacher": ["teach", "er"],
-    "student": ["stu", "dent"],
-    "reading": ["read", "ing"],
-    "writing": ["writ", "ing"],
-    "english": ["eng", "lish"],
-    "book": ["book"],
-    "pencil": ["pen", "cil"],
-    "computer": ["com", "pu", "ter"],
-    "classroom": ["class", "room"],
-    "learning": ["learn", "ing"],
-    "window": ["win", "dow"],
-    "yellow": ["yel", "low"],
-    "happy": ["hap", "py"],
-    "family": ["fam", "i", "ly"],
-    "water": ["wa", "ter"],
-    "mother": ["moth", "er"],
-    "father": ["fa", "ther"],
-    "brother": ["broth", "er"],
-    "sister": ["sis", "ter"],
-    "grandparent": ["grand", "pa", "rent"],
-    "grandparents": ["grand", "pa", "rents"],
-    "beautiful": ["beau", "ti", "ful"],
-    "children": ["chil", "dren"],
-    "understand": ["un", "der", "stand"],
-    "important": ["im", "por", "tant"],
-    "different": ["dif", "fer", "ent"],
-    "remember": ["re", "mem", "ber"],
-    "helpful": ["help","ful"],
-  };
-
-  if (dictionarySyllables[cleanWord]) {
-    let matchedSyllables = [...dictionarySyllables[cleanWord]];
-    if (trimmedWord[0] === trimmedWord[0].toUpperCase() && matchedSyllables.length > 0) {
-      matchedSyllables[0] = matchedSyllables[0].charAt(0).toUpperCase() + matchedSyllables[0].slice(1);
-    }
-    return matchedSyllables;
-  }
-
-  const vowels = "aeiouy";
-  let syllables = [];
-  let current = "";
-  
-  for (let i = 0; i < trimmedWord.length; i++) {
-    current += trimmedWord[i];
-    let isCurrVowel = vowels.includes(trimmedWord[i].toLowerCase());
-    let nextChar = trimmedWord[i + 1];
-    let nextNextChar = trimmedWord[i + 2];
-
-    if (isCurrVowel && nextChar && !vowels.includes(nextChar.toLowerCase()) && nextNextChar && !vowels.includes(nextNextChar.toLowerCase())) {
-      current += nextChar;
-      i++;
-      syllables.push(current);
-      current = "";
-    } 
-    else if (isCurrVowel && nextChar && !vowels.includes(nextChar.toLowerCase()) && nextNextChar && vowels.includes(nextNextChar.toLowerCase())) {
-      syllables.push(current);
-      current = "";
-    }
-  }
-
-  if (current) {
-    if (syllables.length > 0 && current.length <= 2 && !/[aeiouy]/i.test(current)) {
-      syllables[syllables.length - 1] += current;
-    } else {
-      syllables.push(current);
-    }
-  }
-
-  return syllables.length > 0 ? syllables : [trimmedWord];
-}
-
 /* ------------------ prepareText FUNCTION ------------------ */
 function prepareText(text) {
   displayArea.innerHTML = "";
@@ -1651,8 +1693,8 @@ function activateTeacherTestMode() {
     prepareText(inputText.value);
   }
 
-  studentStageSelect.innerHTML = '<option value="Test Grade" selected>Test Grade</option>';
-  studentClassSelect.innerHTML = '<option value="Test Class" selected>Test Class</option>';
+  studentStageSelect.innerHTML = '<option value="Teacher Test Grade" selected>Teacher Test Grade (Simulation)</option>';
+  studentClassSelect.innerHTML = '<option value="Teacher Test Class" selected>Teacher Test Class (Simulation)</option>';
   
   studentNameSelect.innerHTML = '';
   let testOpt = document.createElement("option");
@@ -1663,6 +1705,7 @@ function activateTeacherTestMode() {
 
   alert("Teacher Simulation Active!\n\nYou can now test the reading assessment directly as a student. Click 'Start Reading Test', record your reading, and submit to check evaluation.");
 }
+
 function exitTestMode() {
   isTeacherTestMode = false;
   document.getElementById("testModeBanner").style.display = "none";
@@ -1733,7 +1776,7 @@ function checkUrlParams() {
     }
 
     window.pendingHtmlContent = sharedHtml ? decodeURIComponent(sharedHtml) : null;
-    window.pendingLegacyText = sharedTextLegacy ? decodeURIComponent(sharedTextLegacy) : null;
+    window.pendingLegacyTest = sharedTextLegacy ? decodeURIComponent(sharedTextLegacy) : null;
   }
 }
 
@@ -1751,6 +1794,8 @@ function populateStagesDropdown(data) {
   studentNameSelect.disabled = true;
 
   Object.keys(data).forEach(stageName => {
+    if (stageName.toLowerCase().includes("test") || stageName.toLowerCase().includes("teacher")) return;
+
     const opt = document.createElement("option");
     opt.value = stageName;
     opt.textContent = stageName;
@@ -1863,7 +1908,7 @@ function executeStudentLogin(evt) {
   }
 }
 
-/* ------------------ ENHANCED SPEECH RECOGNITION (HIGH SENSITIVITY & 800ms DELAY) ------------------ */
+/* ------------------ SPEECH RECOGNITION ------------------ */
 const startRecBtn = document.getElementById("startRecBtn");
 const pauseRecBtn = document.getElementById("pauseRecBtn");
 const stopRecBtn = document.getElementById("stopRecBtn");
@@ -2116,6 +2161,7 @@ function evaluateAndCategorizeWords(spoken, original) {
   return { score, missed: finalMissingWords, incorrect: finalIncorrectWords };
 }
 
+/* ------------------ تحديث وحفظ الإحصائيات الفورية ------------------ */
 function updateTeacherStats(score) {
   let count = parseInt(localStorage.getItem("totalSubmissions") || "0") + 1;
   let totalScoreSum = parseInt(localStorage.getItem("totalScoreSum") || "0") + score;
@@ -2123,9 +2169,13 @@ function updateTeacherStats(score) {
   localStorage.setItem("totalSubmissions", count);
   localStorage.setItem("totalScoreSum", totalScoreSum);
 
-  document.getElementById("dashTotalSubmissions").textContent = count;
-  document.getElementById("dashAvgScore").textContent = Math.round(totalScoreSum / count) + "%";
-  document.getElementById("dashActiveGrade").textContent = studentStageSelect.value || "-";
+  const subElem = document.getElementById("dashTotalSubmissions");
+  const avgElem = document.getElementById("dashAvgScore");
+  const gradeElem = document.getElementById("dashActiveGrade");
+
+  if (subElem) subElem.textContent = count;
+  if (avgElem) avgElem.textContent = Math.round(totalScoreSum / count) + "%";
+  if (gradeElem) gradeElem.textContent = studentStageSelect.value || "General";
 }
 
 /* ------------------ EVALUATE & SAVE RESULT TO CLOUD ------------------ */
@@ -2216,6 +2266,17 @@ async function evaluateAndSaveResult(spoken, original, className, studentName) {
 
 document.addEventListener("DOMContentLoaded", function() {
   loadClassesData();
+  
+  // تحميل إحصائيات لوحة التحكم المخزنة مسبقاً فور فتح الصفحة
+  let count = localStorage.getItem("totalSubmissions") || "0";
+  let totalScoreSum = localStorage.getItem("totalScoreSum") || "0";
+  
+  if (document.getElementById("dashTotalSubmissions")) {
+    document.getElementById("dashTotalSubmissions").textContent = count;
+  }
+  if (document.getElementById("dashAvgScore") && parseInt(count) > 0) {
+    document.getElementById("dashAvgScore").textContent = Math.round(parseInt(totalScoreSum) / parseInt(count)) + "%";
+  }
 });
 </script>
 
