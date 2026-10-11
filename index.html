@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,8 @@
 
 <!-- Font Awesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Google Fonts for Modern Typography -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Canvas Confetti Library for Visual Effects -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -24,38 +26,134 @@
     --info-hover: #0284c7;
     --bg-light: #f8fafc;
     --border-color: #e2e8f0;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --card-bg: #ffffff;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 10px 25px -5px rgba(79, 70, 229, 0.1);
   }
 
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f1f5f9; color: #334155; }
-  textarea { width: 100%; height: 150px; font-size: 16px; padding: 12px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 30px 20px;
+    background-color: #f1f5f9;
+    color: var(--text-main);
+    text-align: left;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* Status Badge */
+  #netStatus {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+  #netStatus.online { background-color: #d1fae5; color: #065f46; }
+  #netStatus.offline { background-color: #fee2e2; color: #991b1b; }
+
+  h2, h3, h4 { color: var(--text-main); font-weight: 700; }
   
+  #editorTitle {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  textarea, select, input[type="text"], input[type="password"] {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: #ffffff;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+  }
+
+  textarea:focus, select:focus, input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+
+  textarea { height: 140px; resize: vertical; }
+
+  /* Cards Styling */
+  .student-card, .teacher-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-subtle);
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .teacher-card:hover, .student-card:hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .teacher-card h3, .student-card h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary-color);
+    border-bottom: 2px solid #f8fafc;
+    padding-bottom: 12px;
+  }
+
+  /* Controls Section */
   #controls { 
     margin: 20px 0; 
-    background: white; 
-    padding: 20px; 
-    border-radius: 12px; 
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
-  }
-  
-  #displayArea {
-    margin-top: 10px; 
-    padding: 15px; 
+    background: var(--card-bg); 
+    padding: 24px; 
+    border-radius: var(--radius-lg); 
+    box-shadow: var(--shadow-subtle); 
     border: 1px solid var(--border-color);
-    min-height: 120px; 
-    line-height: 2; 
+  }
+
+  #displayArea {
+    margin-top: 15px; 
+    padding: 24px; 
+    border: 1px solid var(--border-color);
+    min-height: 140px; 
+    line-height: 2.2; 
     font-size: 22px; 
-    background: white; 
-    border-radius: 8px;
+    background: var(--card-bg); 
+    border-radius: var(--radius-lg);
     white-space: pre-wrap;
     word-break: normal;
     overflow-wrap: normal;
     max-width: 100%;           
     box-sizing: border-box;    
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
   }
 
   .sentence {
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     cursor: pointer;
     white-space: pre-wrap;
   }
@@ -67,12 +165,12 @@
   }
 
   .word {
-    padding: 2px 4px;
-    margin: 0 1px;
+    padding: 3px 6px;
+    margin: 0 2px;
     display: inline-block;
     cursor: pointer;
     outline: none;
-    border-radius: 4px;
+    border-radius: 6px;
     transition: background-color 0.15s ease, transform 0.15s ease;
     white-space: nowrap;
   }
@@ -83,266 +181,278 @@
 
   #displayArea[contenteditable="true"] {
     outline: 2px solid var(--primary-color);
-    padding: 14px;
-    white-space: pre-wrap;
+    padding: 24px;
+    background: #ffffff;
   }
 
+  /* Buttons Styling */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 18px;
+    padding: 11px 20px;
     font-size: 14px;
     font-weight: 600;
     color: white;
     background-color: var(--primary-color);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    margin-right: 5px;
-    margin-bottom: 5px;
+    box-shadow: 0 2px 5px rgba(79, 70, 229, 0.2);
+    margin-right: 6px;
+    margin-bottom: 8px;
   }
 
   .btn:hover {
     background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
   }
 
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .btn-success { background-color: var(--success-color); }
-  .btn-success:hover { background-color: var(--success-hover); }
-  .btn-warning { background-color: var(--warning-color); color: white; }
-  .btn-warning:hover { background-color: var(--warning-hover); }
-  .btn-danger { background-color: var(--danger-color); }
-  .btn-danger:hover { background-color: var(--danger-hover); }
-  .btn-info { background-color: var(--info-color); }
-  .btn-info:hover { background-color: var(--info-hover); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-success { background-color: var(--success-color); box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2); }
+  .btn-success:hover { background-color: var(--success-hover); box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3); }
+  .btn-warning { background-color: var(--warning-color); color: white; box-shadow: 0 2px 5px rgba(245, 158, 11, 0.2); }
+  .btn-warning:hover { background-color: var(--warning-hover); box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3); }
+  .btn-danger { background-color: var(--danger-color); box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2); }
+  .btn-danger:hover { background-color: var(--danger-hover); box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3); }
+  .btn-info { background-color: var(--info-color); box-shadow: 0 2px 5px rgba(14, 165, 233, 0.2); }
+  .btn-info:hover { background-color: var(--info-hover); box-shadow: 0 6px 12px rgba(14, 165, 233, 0.3); }
 
   .btn-toggle {
     background-color: #f1f5f9;
-    color: #475569;
+    color: var(--text-muted);
     border: 1px solid var(--border-color);
+    box-shadow: none;
   }
+  .btn-toggle:hover { background-color: #e2e8f0; color: var(--text-main); transform: none; }
   .btn-toggle.active {
     background-color: #e0e7ff;
     color: var(--primary-color);
     border-color: #c7d2fe;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
   }
 
   .btn-fmt {
-    padding: 6px 12px;
+    padding: 8px 14px;
     font-size: 14px;
-    background: #f1f5f9;
+    background: #ffffff;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    color: #334155;
+    color: var(--text-main);
+    transition: all 0.2s;
   }
+  .btn-fmt:hover { background-color: #f1f5f9; border-color: var(--primary-color); color: var(--primary-color); }
 
   .toolbar {
-    background: white;
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 12px 18px;
-    border-radius: 10px;
+    padding: 16px 20px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-top: 15px;
+    gap: 20px;
+    margin-top: 20px;
     flex-wrap: wrap;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: var(--shadow-subtle);
   }
 
   .current-word { 
     background-color: #fef08a !important; 
     color: #1e293b !important;
-    box-shadow: 0 0 0 2px #facc15;
+    box-shadow: 0 0 0 3px #facc15;
+    border-radius: 6px;
   }
-  .current-sentence { background-color: #e0f2fe; border-radius: 4px; }
+  .current-sentence { background-color: #e0f2fe; border-radius: 8px; transition: background-color 0.3s ease; }
 
   /* Syllable Colors */
-  .syllable-1 { color: #2563eb; }
-  .syllable-2 { color: #ea580c; }
-  .syllable-3 { color: #16a34a; }
-  .syllable-4 { color: #9333ea; }
-  .syllable-5 { color: #dc2626; }
-  .punctuation { color: #64748b; font-weight: bold; }
+  .syllable-1 { color: #2563eb; font-weight: 600; }
+  .syllable-2 { color: #ea580c; font-weight: 600; }
+  .syllable-3 { color: #16a34a; font-weight: 600; }
+  .syllable-4 { color: #9333ea; font-weight: 600; }
+  .syllable-5 { color: #dc2626; font-weight: 600; }
+  .punctuation { color: var(--text-muted); font-weight: bold; }
 
   .popup {
     position: fixed;
     background: #0f172a;
     color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
     font-size: 14px;
+    font-weight: 500;
     white-space: nowrap;
     z-index: 999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
   }
 
   .translate-btn {
     position: fixed;
     background: var(--primary-color);
     color: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     z-index: 999;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
   }
 
   #linkContainer {
     margin-top: 15px;
     display: none;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
+    background: #f8fafc;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
   }
 
   #generatedLinkInput {
-    width: 60%;
-    padding: 10px;
+    flex: 1;
+    min-width: 250px;
+    padding: 10px 14px;
     font-size: 14px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: #f8fafc;
-    box-sizing: border-box;
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    direction: ltr;
   }
 
-  select, input[type="range"], input[type="text"], input[type="password"] {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    font-size: 14px;
-    box-sizing: border-box;
-  }
-
-  #webAppUrl, #assignmentTitleInput, #voiceSelect, #genderFilter {
+  #assignmentTitleInput, #voiceSelect, #genderFilter {
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  .student-card, .teacher-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    box-sizing: border-box;
-  }
-
   .score-badge {
     display: inline-block;
-    padding: 10px 20px;
-    font-size: 24px;
-    font-weight: bold;
+    padding: 12px 28px;
+    font-size: 28px;
+    font-weight: 800;
     border-radius: 50px;
     color: white;
     background-color: var(--primary-color);
     margin-top: 10px;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
   }
 
   #liveSpeechDisplay {
-    margin-top: 10px;
+    margin-top: 15px;
     font-style: italic;
-    color: #64748b;
+    color: var(--text-muted);
     background: #f8fafc;
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
     border: 1px dashed #cbd5e1;
-    min-height: 24px;
+    min-height: 28px;
+    font-size: 15px;
   }
 
-  .status-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-  .status-badge.online { background-color: #d1fae5; color: #065f46; }
-  .status-badge.offline { background-color: #fee2e2; color: #991b1b; }
   .hidden { display: none !important; }
 
   .flashcard-box {
-    background: #f1f5f9;
+    background: #ffffff;
     border: 2px dashed var(--primary-color);
-    border-radius: 12px;
-    padding: 30px;
+    border-radius: var(--radius-lg);
+    padding: 40px;
     text-align: center;
-    font-size: 36px;
-    font-weight: bold;
+    font-size: 42px;
+    font-weight: 700;
     color: var(--primary-color);
-    margin: 15px 0;
+    margin: 20px 0;
+    box-shadow: inset 0 2px 8px rgba(79, 70, 229, 0.05);
   }
 
   .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
     margin-top: 15px;
   }
 
   .dash-stat {
     background: #f8fafc;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 20px;
+    border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
   }
 
-  .dash-stat h4 { margin: 0 0 5px 0; font-size: 14px; color: #64748b; }
-  .dash-stat p { margin: 0; font-size: 22px; font-weight: bold; color: var(--primary-color); }
+  .dash-stat h4 { margin: 0 0 8px 0; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .dash-stat p { margin: 0; font-size: 26px; font-weight: 800; color: var(--primary-color); }
 
   @keyframes floatStar {
     0% { transform: translateY(0px) rotate(0deg) scale(0.5); opacity: 0; }
-    50% { opacity: 1; transform: translateY(-40px) rotate(180deg) scale(1.2); }
-    100% { transform: translateY(-80px) rotate(360deg) scale(1); opacity: 0; }
+    50% { opacity: 1; transform: translateY(-50px) rotate(180deg) scale(1.3); }
+    100% { transform: translateY(-100px) rotate(360deg) scale(1); opacity: 0; }
   }
   .floating-star {
     position: fixed;
     color: #f59e0b;
-    font-size: 24px;
+    font-size: 26px;
     animation: floatStar 1.5s ease-out forwards;
     pointer-events: none;
     z-index: 9999;
+  }
+  
+  .test-mode-banner {
+    background-color: #fef3c7;
+    border: 2px dashed #f59e0b;
+    color: #92400e;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: #475569;
+    display: inline-block;
+    margin-bottom: 6px;
   }
 </style>
 </head>
 
 <body>
 
+<div class="container-wrapper">
+
 <div id="netStatus" class="status-badge online"><i class="fa-solid fa-wifi"></i> Online Mode</div>
 
-<h2 id="editorTitle">Text Input & Stories Library</h2>
+<h2 id="editorTitle"><i class="fa-solid fa-book-bookmark" style="color: var(--primary-color);"></i> Text Input & Stories Library</h2>
 
 <!-- Teacher Settings -->
 <div id="teacherSetupArea" class="teacher-card">
-  <h3><i class="fa-solid fa-users-gear"></i> Teacher Settings (Classes & Google Sheets Integration)</h3>
-  <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+  <h3><i class="fa-solid fa-gear"></i> Teacher Settings & Classes Data</h3>
+  <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
     <div style="flex: 1; min-width: 280px; box-sizing: border-box;">
-      <label><b>Google Web App URL (Google Sheets Connector):</b></label>
-      <input type="text" id="webAppUrl" value="https://script.google.com/macros/s/AKfycbzkB2UxFtXVNA8PArJyDG04YaLGB4KU79Ewa_7gYaa1cihwE6x2QTjjegh0DhHGqk03FQ/exec" placeholder="https://script.google.com/macros/s/.../exec" style="margin-top: 5px;">
-    </div>
-    <div style="flex: 1; min-width: 280px; box-sizing: border-box;">
-      <label><b>Classes & Students Data (JSON Format):</b></label>
-      <textarea id="classDataJson" style="height: 100px; font-family: monospace; font-size: 12px;" placeholder="Paste JSON data here..."></textarea>
+      <label><b>Classes & Students Data (JSON):</b></label>
+      <textarea id="classDataJson" style="height: 120px; font-family: monospace; font-size: 12px; direction: ltr;" placeholder="Paste JSON data here..."></textarea>
     </div>
   </div>
-  <button id="saveTeacherSettingsBtn" class="btn btn-info" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+  <button id="saveTeacherSettingsBtn" class="btn btn-info" style="margin-top: 12px;"><i class="fa-solid fa-floppy-disk"></i> Save & Apply Student Data</button>
+  <span id="loadStatusMsg" style="margin-left: 10px; font-weight: 600; font-size: 13px;"></span>
 </div>
 
 <!-- Teacher Dashboard Statistics -->
-<div id="teacherDashboardCard" class="teacher-card" style="margin-top: 15px;">
+<div id="teacherDashboardCard" class="teacher-card" style="margin-top: 20px;">
   <h3><i class="fa-solid fa-chart-line"></i> Teacher Performance Dashboard</h3>
   <div class="dashboard-grid">
     <div class="dash-stat">
@@ -361,9 +471,9 @@
 </div>
 
 <!-- Stories Loader Section -->
-<div id="storiesLoaderCard" class="teacher-card" style="margin-top: 15px; background: #f8fafc;">
+<div id="storiesLoaderCard" class="teacher-card" style="margin-top: 20px; background: #f8fafc;">
   <h3><i class="fa-solid fa-book-open-reader"></i> Stories Library</h3>
-  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;">
+  <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px;">
     <select id="storyGradeFilter" style="flex: 1; min-width: 180px;" onchange="filterStoriesByGrade()">
       <option value="">-- All Grade Levels --</option>
       <option value="Grade 1">Grade 1 / Beginners</option>
@@ -379,82 +489,87 @@
 </div>
 
 <!-- Assignment Title Configuration for Teacher -->
-<div id="assignmentTitleCard" class="teacher-card" style="margin-top: 15px;">
+<div id="assignmentTitleCard" class="teacher-card" style="margin-top: 20px;">
   <label for="assignmentTitleInput"><b><i class="fa-solid fa-file-pen"></i> Assignment / Lesson Title (Unique Key):</b></label>
-  <input type="text" id="assignmentTitleInput" placeholder="e.g., Reading Assignment 1: Phonics & Vocabulary" style="margin-top: 5px;">
+  <input type="text" id="assignmentTitleInput" placeholder="e.g., Reading Assignment 1: Phonics & Vocabulary" style="margin-top: 8px;">
 </div>
 
-<textarea id="inputText" placeholder="Paste your text here..."></textarea>
+<textarea id="inputText" placeholder="Paste your text here..." style="margin-top: 10px;"></textarea>
 
 <!-- Student Login Portal -->
-<div id="studentLoginWrapper" class="student-card" style="display: none; max-width: 500px; margin: 20px auto;">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <div style="font-size: 2.2rem; margin-bottom: 6px;">🎓</div>
-        <div id="studentAssignmentTitleDisplay" style="background: #e0e7ff; color: var(--primary-color); padding: 12px 16px; border-radius: 10px; font-weight: bold; font-size: 1.4rem; margin-bottom: 12px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.04);"></div>
-        <h4 style="color: #64748b; font-size: 0.95rem; font-weight: 600; margin: 0;">Student Portal Login</h4>
-        <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px;">Please select your details and enter your PIN</p>
+<div id="studentLoginWrapper" class="student-card" style="display: none; max-width: 480px; margin: 40px auto; padding: 35px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🎓</div>
+        <div id="studentAssignmentTitleDisplay" style="background: #e0e7ff; color: var(--primary-color); padding: 12px 16px; border-radius: var(--radius-md); font-weight: 700; font-size: 1.25rem; margin-bottom: 16px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.04);"></div>
+        <h4 style="color: var(--text-main); font-size: 1.2rem; font-weight: 700; margin: 0;">Student Portal Login</h4>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 6px;">Please select your details and enter your 4-digit PIN</p>
     </div>
     
-    <div style="display: flex; flex-direction: column; gap: 14px;">
-        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
             <label for="studentStageSelect">🏫 Select Grade:</label>
             <select id="studentStageSelect" onchange="loadStudentClassesDropdown()">
                 <option value="">-- Choose Grade --</option>
             </select>
         </div>
 
-        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
             <label for="studentClassSelect">📚 Select Class:</label>
             <select id="studentClassSelect" onchange="loadStudentNamesDropdown()">
                 <option value="">-- Choose Grade First --</option>
             </select>
         </div>
 
-        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
             <label for="studentNameSelect">👤 Select Student Name:</label>
             <select id="studentNameSelect">
                 <option value="">-- Choose Class First --</option>
             </select>
         </div>
 
-        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
             <label for="studentPinInput">🔒 PIN (Last 4 digits of ID):</label>
-            <input type="password" id="studentPinInput" maxlength="4" placeholder="Enter last 4 digits">
+            <input type="password" id="studentPinInput" maxlength="4" placeholder="Enter last 4 digits" style="direction: ltr; text-align: left; letter-spacing: 4px; font-weight: 600;">
         </div>
 
-        <button onclick="executeStudentLogin(event)" class="btn" style="width: 100%; margin-top: 5px; justify-content: center;">Login to Activity</button>
-        <div id="studentLoginErrorMsg" style="color: var(--danger-color); font-size: 0.85rem; text-align: center; display: none; background: #fee2e2; padding: 8px; border-radius: 6px;"></div>
+        <button onclick="executeStudentLogin(event)" class="btn" style="width: 100%; margin-top: 10px; justify-content: center; padding: 13px; font-size: 15px;">Login to Activity</button>
+        <div id="studentLoginErrorMsg" style="color: var(--danger-color); font-size: 0.85rem; text-align: center; display: none; background: #fee2e2; padding: 10px; border-radius: var(--radius-md); font-weight: 500;"></div>
     </div>
 </div>
 
 <!-- Main Application / Student Workspace -->
 <div id="mainAppContent" style="display: block;">
 
+  <!-- Teacher Simulation Test Banner -->
+  <div id="testModeBanner" class="test-mode-banner" style="display: none;">
+    <span><i class="fa-solid fa-vial-circle-check"></i> <b>Teacher Test Mode:</b> Testing student view & submit feature!</span>
+    <button onclick="exitTestMode()" class="btn btn-warning" style="padding: 6px 12px; font-size: 12px; margin: 0;"><i class="fa-solid fa-arrow-left"></i> Exit Test Mode</button>
+  </div>
+
   <!-- Audio & Reading Controls -->
   <div id="controls">
-    <div style="margin-bottom: 15px;">
-      <label><i class="fa-solid fa-gauge-high"></i> Reading Speed:</label>
-      <input type="range" id="speedRange" min="0.3" max="2.0" step="0.1" value="0.7">
-      <span id="speedValue">0.7x</span>
+    <div style="margin-bottom: 18px;">
+      <label><i class="fa-solid fa-gauge-high"></i> Reading Speed: <span id="speedValue" style="color: var(--primary-color); font-weight: 700;">0.7x</span></label>
+      <input type="range" id="speedRange" min="0.3" max="2.0" step="0.1" value="0.7" style="margin-top: 6px;">
     </div>
 
     <!-- Voice Gender & Voice Selection -->
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-      <div style="flex: 1; min-width: 150px;">
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 18px;">
+      <div style="flex: 1; min-width: 180px;">
         <label><i class="fa-solid fa-venus-mars"></i> Reader Gender:</label>
         <select id="genderFilter" onchange="loadVoices()">
           <option value="all">All Genders</option>
-          <option value="female">Female Voice (أنثى)</option>
-          <option value="male">Male Voice (ذكر)</option>
+          <option value="female">Female Voice</option>
+          <option value="male">Male Voice</option>
         </select>
       </div>
-      <div style="flex: 2; min-width: 250px;">
+      <div style="flex: 2; min-width: 260px;">
         <label><i class="fa-solid fa-microphone"></i> Voice Selection:</label>
         <select id="voiceSelect"></select>
       </div>
     </div>
 
-    <div style="margin-bottom: 15px;">
+    <div style="margin-bottom: 20px;">
       <label><i class="fa-solid fa-sliders"></i> Reading Mode:</label>
       <select id="modeSelect">
         <option value="sentence">Sentence by Sentence</option>
@@ -463,7 +578,7 @@
       </select>
     </div>
 
-    <div style="margin-top: 20px;">
+    <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 6px;">
       <button id="prepareBtn" class="btn"><i class="fa-solid fa-file-code"></i> Prepare Text</button>
       <button id="togglePlayBtn" class="btn btn-success"><i class="fa-solid fa-play"></i> Start Reading</button>
       <button id="pauseAudioBtn" class="btn btn-warning"><i class="fa-solid fa-pause"></i> Pause Audio</button>
@@ -471,12 +586,13 @@
       <button id="flashcardModeBtn" class="btn btn-info"><i class="fa-solid fa-layer-group"></i> Word Practice (Flashcards)</button>
     </div>
 
-    <div id="teacherLinkSection" style="margin-top: 15px;">
+    <div id="teacherLinkSection" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
       <button id="generateLinkBtn" class="btn btn-info"><i class="fa-solid fa-share-nodes"></i> Generate Student Link</button>
+      <button id="testStudentViewBtn" class="btn btn-warning" onclick="activateTeacherTestMode()"><i class="fa-solid fa-vial"></i> 🧪 Test Student View & Submit</button>
       <div id="linkContainer">
         <input type="text" id="generatedLinkInput" readonly>
-        <button id="copyBtn" class="btn btn-success"><i class="fa-regular fa-copy"></i> Copy Link</button>
-        <a id="openBtn" class="btn btn-info" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Link</a>
+        <button id="copyBtn" class="btn btn-success" style="margin: 0;"><i class="fa-regular fa-copy"></i> Copy Link</button>
+        <a id="openBtn" class="btn btn-info" target="_blank" style="margin: 0; text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Link</a>
       </div>
     </div>
   </div>
@@ -485,7 +601,7 @@
   <div id="flashcardArea" class="student-card" style="display: none;">
     <h3><i class="fa-solid fa-font"></i> Word-by-Word Practice Cards</h3>
     <div id="flashcardContent" class="flashcard-box">Click Next to Start</div>
-    <div style="text-align: center; gap: 10px; display: flex; justify-content: center;">
+    <div style="text-align: center; gap: 10px; display: flex; justify-content: center; flex-wrap: wrap;">
       <button id="prevCardBtn" class="btn btn-toggle"><i class="fa-solid fa-arrow-left"></i> Previous</button>
       <button id="speakCardBtn" class="btn btn-success"><i class="fa-solid fa-volume-high"></i> Pronounce</button>
       <button id="nextCardBtn" class="btn btn-primary"><i class="fa-solid fa-arrow-right"></i> Next Word</button>
@@ -493,21 +609,21 @@
     </div>
   </div>
 
-  <h3 id="processedTextTitle">Processed Text</h3>
+  <h3 id="processedTextTitle" style="margin-top: 30px; font-size: 1.3rem;">Processed Text</h3>
 
   <!-- Teacher Toolbar -->
   <div class="toolbar" id="teacherToolbar">
     <div>
       <label for="colorPicker"><i class="fa-solid fa-palette" style="color: #6366f1;"></i> Color Picker:</label>
-      <input type="color" id="colorPicker" value="#2563eb">
+      <input type="color" id="colorPicker" value="#2563eb" style="width: 50px; height: 38px; padding: 2px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border-color); vertical-align: middle;">
     </div>
     
-    <div style="display: flex; gap: 8px;">
+    <div style="display: flex; gap: 10px;">
       <button id="paintBtn" class="btn btn-toggle"><i class="fa-solid fa-paint-brush"></i> Paint Mode: OFF</button>
       <button id="editBtn" class="btn btn-toggle"><i class="fa-solid fa-pen-to-square"></i> Edit Text: OFF</button>
     </div>
 
-    <div id="formattingControls" style="display: none; gap: 5px;">
+    <div id="formattingControls" style="display: none; gap: 8px;">
       <button type="button" class="btn-fmt" onclick="formatText('bold')" title="Bold"><i class="fa-solid fa-bold"></i></button>
       <button type="button" class="btn-fmt" onclick="formatText('italic')" title="Italic"><i class="fa-solid fa-italic"></i></button>
       <button type="button" class="btn-fmt" onclick="formatText('underline')" title="Underline"><i class="fa-solid fa-underline"></i></button>
@@ -517,30 +633,32 @@
   <div id="displayArea"></div>
 
   <!-- Student Reading Test -->
-  <div id="studentAssessmentArea" class="student-card" style="margin-top: 20px;">
+  <div id="studentAssessmentArea" class="student-card" style="margin-top: 30px;">
     <h3><i class="fa-solid fa-microphone-lines"></i> Student Reading Practice & Automatic Evaluation</h3>
-    <p>Click Start Reading Test to begin, use Pause/Resume as needed, and click Stop & Submit when finished to get evaluated.</p>
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Click Start Reading Test to begin, use Pause/Resume as needed, and click Stop & Submit when finished to get evaluated.</p>
     
-    <button id="startRecBtn" class="btn btn-success"><i class="fa-solid fa-microphone"></i> Start Reading Test</button>
-    <button id="pauseRecBtn" class="btn btn-warning" disabled><i class="fa-solid fa-pause"></i> Pause Recording</button>
-    <button id="stopRecBtn" class="btn btn-danger" disabled><i class="fa-solid fa-square"></i> Stop & Submit</button>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+      <button id="startRecBtn" class="btn btn-success"><i class="fa-solid fa-microphone"></i> Start Reading Test</button>
+      <button id="pauseRecBtn" class="btn btn-warning" disabled><i class="fa-solid fa-pause"></i> Pause Recording</button>
+      <button id="stopRecBtn" class="btn btn-danger" disabled><i class="fa-solid fa-square"></i> Stop & Submit</button>
+    </div>
     
     <div id="liveSpeechDisplay">Recognized text will appear here as you read...</div>
 
-    <div id="assessmentResults" style="margin-top: 15px; display: none;">
-      <h4>Your Score:</h4>
+    <div id="assessmentResults" style="margin-top: 25px; display: none; text-align: center; background: #f8fafc; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+      <h4 style="margin-top: 0; color: var(--text-muted);">Your Score:</h4>
       <div id="scoreBadge" class="score-badge">0%</div>
-      <p id="submissionStatus" style="margin-top: 10px; font-weight: bold;"></p>
+      <p id="submissionStatus" style="margin-top: 15px; font-weight: 600; color: var(--text-main);"></p>
       
       <!-- Missed Words Section -->
-      <div id="missedWordsContainer" style="margin-top: 15px; padding: 14px; background: #fefce8; border: 1px solid #fde047; border-radius: 8px; display: none;">
-        <h5 style="color: #ca8a04; margin: 0 0 10px 0; font-size: 16px;"><i class="fa-solid fa-triangle-exclamation"></i> Missed Words (Click to hear pronunciation):</h5>
+      <div id="missedWordsContainer" style="margin-top: 20px; padding: 18px; background: #fefce8; border: 1px solid #fde047; border-radius: var(--radius-md); display: none; text-align: left;">
+        <h5 style="color: #ca8a04; margin: 0 0 12px 0; font-size: 16px;"><i class="fa-solid fa-triangle-exclamation"></i> Missed Words (Click to hear pronunciation):</h5>
         <div id="missedWordsList" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
       </div>
 
       <!-- Incorrectly Pronounced Words Section -->
-      <div id="incorrectWordsContainer" style="margin-top: 15px; padding: 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; display: none;">
-        <h5 style="color: #991b1b; margin: 0 0 10px 0; font-size: 16px;"><i class="fa-solid fa-circle-xmark"></i> Incorrectly Pronounced Words (Click to hear correct pronunciation):</h5>
+      <div id="incorrectWordsContainer" style="margin-top: 20px; padding: 18px; background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-md); display: none; text-align: left;">
+        <h5 style="color: #991b1b; margin: 0 0 12px 0; font-size: 16px;"><i class="fa-solid fa-circle-xmark"></i> Incorrectly Pronounced Words (Click to hear correct pronunciation):</h5>
         <div id="incorrectWordsList" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
       </div>
     </div>
@@ -548,7 +666,54 @@
 
 </div>
 
+</div>
+
 <script>
+// Send student score to JSONBin
+async function sendScoreToNetlify(studentName, nationalId, score) {
+  const JSONBIN_BIN_ID = '6ac9f3c3ffd5d160535e6864';
+  const JSONBIN_API_KEY = '$2a$10$S9BUwNoVsbjpzJ659y7/zuIjqGqTr8pRpt4nUrssLgTO/93p15hLm';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentTaskTitle = urlParams.get('story') 
+                        || document.getElementById("assignmentTitleInput")?.value.trim() 
+                        || document.getElementById("studentAssignmentTitleDisplay")?.textContent.trim()
+                        || "General Task";
+
+  try {
+    let getRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_API_KEY }
+    });
+    let getData = await getRes.json();
+    let records = getData.record.records || [];
+
+    let index = records.findIndex(r => String(r.id) === String(nationalId).trim() && r.story === currentTaskTitle);
+    if (index > -1) {
+      records[index].score = score;
+      records[index].name = studentName;
+    } else {
+      records.push({ id: String(nationalId).trim(), name: studentName, story: currentTaskTitle, score: score });
+    }
+
+    let putRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_API_KEY
+      },
+      body: JSON.stringify({ records: records })
+    });
+
+    if (putRes.ok) {
+      console.log(`Student score and story (${currentTaskTitle}) successfully saved to cloud`);
+    } else {
+      console.error("Failed to save data to cloud");
+    }
+  } catch (error) {
+    console.error("Cloud connection error:", error);
+  }
+}
+
 /* ------------------ ONLINE / OFFLINE ------------------ */
 const netStatus = document.getElementById("netStatus");
 
@@ -607,17 +772,15 @@ let activeUtterance = null;
 
 let isPaintMode = false;
 let isEditMode = false;
+let isTeacherTestMode = false;
 
 let translateTimeout = null;
 let highlightTimeout = null;
 
 let classesData = {};
 let storiesData = [];
-let savedWebAppUrl = localStorage.getItem("webAppUrl") || "";
 
 let currentCardIndex = 0;
-
-document.getElementById("webAppUrl").value = savedWebAppUrl;
 
 /* ------------------ LOAD CLASSES DATA ------------------ */
 function loadClassesData() {
@@ -625,26 +788,37 @@ function loadClassesData() {
     const localData = localStorage.getItem("classesData");
     if (localData) {
       classesData = JSON.parse(localData);
-      document.getElementById("classDataJson").value = JSON.stringify(classesData, null, 2);
+      if (document.getElementById("classDataJson")) {
+        document.getElementById("classDataJson").value = JSON.stringify(classesData, null, 2);
+      }
       populateStagesDropdown(classesData);
     }
-  } catch(e){}
+  } catch (e) {
+    console.warn("Error reading localStorage:", e);
+  }
 
-  fetch('./students_hierarchy_structured.json')
+  fetch('./students.json')
     .then(response => {
-      if (!response.ok) throw new Error("File not found");
+      if (!response.ok) {
+        throw new Error(`File not found (Status: ${response.status})`);
+      }
       return response.json();
     })
     .then(data => {
-      classesData = data;
-      document.getElementById("classDataJson").value = JSON.stringify(classesData, null, 2);
-      localStorage.setItem("classesData", JSON.stringify(classesData));
-      populateStagesDropdown(classesData);
+      if (data && typeof data === 'object') {
+        classesData = data;
+        if (document.getElementById("classDataJson")) {
+          document.getElementById("classDataJson").value = JSON.stringify(classesData, null, 2);
+        }
+        localStorage.setItem("classesData", JSON.stringify(classesData));
+        populateStagesDropdown(classesData);
+      }
     })
     .catch(err => {
-      console.log("Using cached classes data from localStorage.");
+      console.error("Failed to fetch students JSON:", err.message);
     });
 }
+loadClassesData();
 
 /* ------------------ DEFAULT EXTENDED STORIES DATA ------------------ */
 const defaultStories = [
@@ -673,6 +847,7 @@ function loadStoriesData() {
       checkUrlParams();
     });
 }
+loadStoriesData();
 
 function populateStoryDropdown(list) {
   const storySelect = document.getElementById("storySelect");
@@ -730,23 +905,20 @@ document.getElementById("loadStoryBtn").addEventListener("click", () => {
 
 document.getElementById("saveTeacherSettingsBtn").addEventListener("click", () => {
   try {
-    classesData = JSON.parse(document.getElementById("classDataJson").value);
-    savedWebAppUrl = document.getElementById("webAppUrl").value.trim();
+    classesData = JSON.parse(document.getElementById("classDataJson").value.trim());
     localStorage.setItem("classesData", JSON.stringify(classesData));
-    localStorage.setItem("webAppUrl", savedWebAppUrl);
-    
     populateStagesDropdown(classesData);
     alert("Settings saved successfully!");
   } catch (e) {
-    alert("Invalid JSON format for class data! Please check your syntax.");
+    alert("Invalid JSON format for class data!");
   }
 });
 
-/* ------------------ ENHANCED SPEECH UTTERANCE CREATION ------------------ */
+/* ------------------ ENHANCED SPEECH UTTERANCE CREATION (MAX VOLUME) ------------------ */
 function createSpeechUtterance(text) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.rate = parseFloat(speedRange.value);
-  utter.volume = 1.0;
+  utter.volume = 1.0; 
   utter.pitch = 1.0;
   
   const voiceSelect = document.getElementById("voiceSelect");
@@ -1086,7 +1258,7 @@ function prepareText(text) {
 
     const paragraphSpan = document.createElement("div");
     paragraphSpan.className = "sentence-line";
-    paragraphSpan.style.marginBottom = "12px";
+    paragraphSpan.style.marginBottom = "14px";
 
     sentences.forEach((sentenceText) => {
       let sentenceSpan = document.createElement('span');
@@ -1221,7 +1393,7 @@ function showTranslateButton(wordSpan) {
   const btn = document.createElement("div");
   btn.className = "translate-btn";
   btn.innerHTML = `<i class="fa-solid fa-language"></i> Translate`;
-  btn.style.top = (rect.top - 35) + "px";
+  btn.style.top = (rect.top - 40) + "px";
   btn.style.left = rect.left + "px";
 
   btn.onclick = async () => {
@@ -1230,7 +1402,7 @@ function showTranslateButton(wordSpan) {
     const popup = document.createElement("div");
     popup.className = "popup";
     popup.textContent = translated;
-    popup.style.top = (rect.top - 65) + "px";
+    popup.style.top = (rect.top - 70) + "px";
     popup.style.left = rect.left + "px";
     document.body.appendChild(popup);
     removeExistingButtons();
@@ -1457,6 +1629,57 @@ copyBtn.addEventListener("click", async () => {
   setTimeout(() => copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy Link`, 2000);
 });
 
+/* ------------------ TEACHER TEST / SIMULATION MODE ------------------ */
+function activateTeacherTestMode() {
+  isTeacherTestMode = true;
+  
+  document.getElementById("teacherSetupArea").style.display = "none";
+  document.getElementById("teacherDashboardCard").style.display = "none";
+  document.getElementById("storiesLoaderCard").style.display = "none";
+  document.getElementById("assignmentTitleCard").style.display = "none";
+  document.getElementById("editorTitle").style.display = "none";
+  document.getElementById("inputText").style.display = "none";
+  document.getElementById("teacherToolbar").style.display = "none";
+  document.getElementById("teacherLinkSection").style.display = "none";
+  document.getElementById("prepareBtn").style.display = "none";
+  document.getElementById("studentLoginWrapper").style.display = "none";
+
+  document.getElementById("mainAppContent").style.display = "block";
+  document.getElementById("testModeBanner").style.display = "flex";
+
+  if (wordsSpans.length === 0 && inputText.value.trim()) {
+    prepareText(inputText.value);
+  }
+
+  studentStageSelect.innerHTML = '<option value="Test Grade" selected>Test Grade</option>';
+  studentClassSelect.innerHTML = '<option value="Test Class" selected>Test Class</option>';
+  
+  studentNameSelect.innerHTML = '';
+  let testOpt = document.createElement("option");
+  testOpt.value = "5555";
+  testOpt.setAttribute("data-name", "[Teacher Test] Professor - Simulation");
+  testOpt.selected = true;
+  studentNameSelect.appendChild(testOpt);
+
+  alert("Teacher Simulation Active!\n\nYou can now test the reading assessment directly as a student. Click 'Start Reading Test', record your reading, and submit to check evaluation.");
+}
+function exitTestMode() {
+  isTeacherTestMode = false;
+  document.getElementById("testModeBanner").style.display = "none";
+  
+  document.getElementById("teacherSetupArea").style.display = "block";
+  document.getElementById("teacherDashboardCard").style.display = "block";
+  document.getElementById("storiesLoaderCard").style.display = "block";
+  document.getElementById("assignmentTitleCard").style.display = "block";
+  document.getElementById("editorTitle").style.display = "block";
+  document.getElementById("inputText").style.display = "block";
+  document.getElementById("teacherToolbar").style.display = "flex";
+  document.getElementById("teacherLinkSection").style.display = "block";
+  document.getElementById("prepareBtn").style.display = "inline-flex";
+
+  populateStagesDropdown(classesData);
+}
+
 /* ------------------ READ URL PARAMS ON LOAD (STUDENT MODE) ------------------ */
 function checkUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -1562,7 +1785,7 @@ function loadStudentNamesDropdown() {
   if (selectedStage && selectedClass && classesData[selectedStage][selectedClass]) {
     studentNameSelect.disabled = false;
     classesData[selectedStage][selectedClass].forEach(studentObj => {
-      const sId = typeof studentObj === 'object' ? (studentObj.id || studentObj.student_id || studentObj["معرف الطالب"] || studentObj["اسم الطالب"]) : studentObj;
+      const sId = typeof studentObj === 'object' ? (studentObj.id || studentObj.nationalId || studentObj["National ID"] || studentObj["معرف الطالب"] || studentObj.student_id) : studentObj;
       const sName = typeof studentObj === 'object' ? (studentObj.name || studentObj["اسم الطالب"]) : studentObj;
       
       const opt = document.createElement("option");
@@ -1640,7 +1863,7 @@ function executeStudentLogin(evt) {
   }
 }
 
-/* ------------------ SPEECH RECOGNITION ------------------ */
+/* ------------------ ENHANCED SPEECH RECOGNITION (HIGH SENSITIVITY & 800ms DELAY) ------------------ */
 const startRecBtn = document.getElementById("startRecBtn");
 const pauseRecBtn = document.getElementById("pauseRecBtn");
 const stopRecBtn = document.getElementById("stopRecBtn");
@@ -1656,17 +1879,22 @@ const incorrectWordsList = document.getElementById("incorrectWordsList");
 
 let recognition = null;
 let recognizedText = "";
+let interimTranscriptAcc = "";
 let isRecording = false;
 let isRecPaused = false;
 
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = "en-US";
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  recognition.onresult = (event) => {
+function initializeSpeechRecognition() {
+  if (!SpeechRecognition) return null;
+  
+  const instance = new SpeechRecognition();
+  instance.continuous = true;
+  instance.interimResults = true;
+  instance.lang = "en-US";
+  instance.maxAlternatives = 5;
+
+  instance.onresult = (event) => {
     let interimTranscript = '';
     for (let i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
@@ -1675,25 +1903,63 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         interimTranscript += event.results[i][0].transcript;
       }
     }
-    liveSpeechDisplay.textContent = recognizedText + interimTranscript;
+    interimTranscriptAcc = interimTranscript;
+    liveSpeechDisplay.textContent = (recognizedText + ' ' + interimTranscript).trim() || "Listening to your reading...";
   };
 
-  recognition.onerror = (event) => { console.warn("Speech recognition error:", event.error); };
-  recognition.onend = () => {
-    if (isRecording && !isRecPaused) {
-      try { recognition.start(); } catch(e){}
+  instance.onerror = (event) => {
+    console.warn("Speech recognition notice/error:", event.error);
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      alert("Please allow microphone permissions in your browser or device settings.");
     }
   };
+
+  instance.onend = () => {
+    if (isRecording && !isRecPaused) {
+      try {
+        instance.start();
+      } catch (e) {}
+    }
+  };
+
+  return instance;
 }
 
-startRecBtn.addEventListener("click", () => {
-  if (!studentStageSelect.value || !studentClassSelect.value || !studentNameSelect.value) {
+async function requestMicrophonePermission() {
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true 
+        } 
+      });
+      stream.getTracks().forEach(track => track.stop());
+    }
+  } catch (err) {
+    console.warn("Media devices permission error:", err);
+  }
+}
+
+startRecBtn.addEventListener("click", async () => {
+  if (!isTeacherTestMode && (!studentStageSelect.value || !studentClassSelect.value || !studentNameSelect.value)) {
     return alert("Please select Grade, Class, and Student Name before starting!");
   }
-  if (!recognition) return alert("Speech Recognition is not supported in this browser. Please use Chrome or Edge.");
+
+  await requestMicrophonePermission();
+
+  if (!recognition) {
+    recognition = initializeSpeechRecognition();
+  }
+
+  if (!recognition) {
+    return alert("Speech recognition is not supported on this browser. Please use a modern version of Google Chrome or Safari.");
+  }
 
   recognizedText = "";
-  liveSpeechDisplay.textContent = "Listening... Speak clearly now.";
+  interimTranscriptAcc = "";
+  liveSpeechDisplay.textContent = "🎙️ Microphone is active.. Start reading clearly.";
   isRecording = true;
   isRecPaused = false;
 
@@ -1703,18 +1969,24 @@ startRecBtn.addEventListener("click", () => {
     pauseRecBtn.disabled = false;
     stopRecBtn.disabled = false;
     assessmentResults.style.display = "none";
-  } catch(e) { console.error(e); }
+  } catch(e) { 
+    console.error("Start recording error:", e);
+    try {
+      recognition.stop();
+      setTimeout(() => recognition.start(), 300);
+    } catch(err) {}
+  }
 });
 
 pauseRecBtn.addEventListener("click", () => {
   if (!recognition || !isRecording) return;
   if (!isRecPaused) {
     isRecPaused = true;
-    recognition.stop();
+    try { recognition.stop(); } catch(e){}
     pauseRecBtn.innerHTML = `<i class="fa-solid fa-play"></i> Resume Recording`;
   } else {
     isRecPaused = false;
-    recognition.start();
+    try { recognition.start(); } catch(e){}
     pauseRecBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Recording`;
   }
 });
@@ -1722,19 +1994,26 @@ pauseRecBtn.addEventListener("click", () => {
 stopRecBtn.addEventListener("click", () => {
   isRecording = false;
   isRecPaused = false;
-  if (recognition) recognition.stop();
+  
+  if (recognition) {
+    try { recognition.stop(); } catch(e){}
+  }
 
   startRecBtn.disabled = false;
   pauseRecBtn.disabled = true;
   stopRecBtn.disabled = true;
 
+  let fullSpokenText = (recognizedText + ' ' + interimTranscriptAcc).trim();
   let originalText = displayArea.innerText.trim() || inputText.value.trim();
+  
   const selectedOption = studentNameSelect.options[studentNameSelect.selectedIndex];
-  const finalStudentName = selectedOption ? selectedOption.getAttribute('data-name') : "";
+  const finalStudentName = selectedOption ? (selectedOption.getAttribute('data-name') || selectedOption.textContent) : "Student";
+
+  liveSpeechDisplay.textContent = fullSpokenText || "No speech was detected. Please try again and speak closer to the microphone.";
 
   setTimeout(() => {
-    evaluateAndUpload(recognizedText, originalText, `${studentStageSelect.value} - ${studentClassSelect.value}`, finalStudentName, savedWebAppUrl);
-  }, 800);
+    evaluateAndSaveResult(fullSpokenText, originalText, `${studentStageSelect.value || 'Grade'} - ${studentClassSelect.value || 'Class'}`, finalStudentName);
+  }, 800); 
 });
 
 function normalizeNumberWords(text) {
@@ -1755,7 +2034,6 @@ function normalizeNumberWords(text) {
   return tokens.map(token => wordToNum[token] || token);
 }
 
-/* ------------------ FUZZY MATCHING (LEVENSHTEIN DISTANCE) FOR SENSITIVITY ------------------ */
 function getLevenshteinDistance(a, b) {
   if (a.length === 0) return b.length;
   if (b.length === 0) return a.length;
@@ -1791,7 +2069,6 @@ function evaluateAndCategorizeWords(spoken, original) {
   let originalTokensList = normalizeNumberWords(original);
 
   let matchedCount = 0;
-  
   let remainingSpoken = [...cleanSpokenWords];
   let tempOriginals = [];
 
@@ -1851,7 +2128,8 @@ function updateTeacherStats(score) {
   document.getElementById("dashActiveGrade").textContent = studentStageSelect.value || "-";
 }
 
-function evaluateAndUpload(spoken, original, className, studentName, appUrl) {
+/* ------------------ EVALUATE & SAVE RESULT TO CLOUD ------------------ */
+async function evaluateAndSaveResult(spoken, original, className, studentName) {
   const evaluation = evaluateAndCategorizeWords(spoken, original);
   const score = evaluation.score;
   const missedWords = evaluation.missed;
@@ -1860,10 +2138,16 @@ function evaluateAndUpload(spoken, original, className, studentName, appUrl) {
   assessmentResults.style.display = "block";
   scoreBadge.textContent = score + "%";
 
-  if (score >= 80) scoreBadge.style.backgroundColor = "var(--success-color)";
-  else if (score >= 50) scoreBadge.style.backgroundColor = "var(--info-color)";
-  else scoreBadge.style.backgroundColor = "var(--danger-color)";
+  if (score >= 80) {
+    scoreBadge.style.backgroundColor = "var(--success-color)";
+    triggerSuccessConfetti();
+  } else if (score >= 50) {
+    scoreBadge.style.backgroundColor = "var(--info-color)";
+  } else {
+    scoreBadge.style.backgroundColor = "var(--danger-color)";
+  }
 
+  // Display Missed Words
   missedWordsList.innerHTML = "";
   if (missedWords.length > 0) {
     missedWordsContainer.style.display = "block";
@@ -1873,7 +2157,7 @@ function evaluateAndUpload(spoken, original, className, studentName, appUrl) {
       tag.style.color = "#ca8a04";
       tag.style.padding = "8px 16px";
       tag.style.borderRadius = "8px";
-      tag.style.fontSize = "18px";
+      tag.style.fontSize = "16px";
       tag.style.fontWeight = "bold";
       tag.style.border = "2px solid #fde047";
       tag.style.cursor = "pointer";
@@ -1891,6 +2175,7 @@ function evaluateAndUpload(spoken, original, className, studentName, appUrl) {
     missedWordsContainer.style.display = "none";
   }
 
+  // Display Incorrect Words
   incorrectWordsList.innerHTML = "";
   if (incorrectWords.length > 0) {
     incorrectWordsContainer.style.display = "block";
@@ -1900,7 +2185,7 @@ function evaluateAndUpload(spoken, original, className, studentName, appUrl) {
       tag.style.color = "#991b1b";
       tag.style.padding = "8px 16px";
       tag.style.borderRadius = "8px";
-      tag.style.fontSize = "18px";
+      tag.style.fontSize = "16px";
       tag.style.fontWeight = "bold";
       tag.style.border = "2px solid #fecaca";
       tag.style.cursor = "pointer";
@@ -1918,46 +2203,19 @@ function evaluateAndUpload(spoken, original, className, studentName, appUrl) {
     incorrectWordsContainer.style.display = "none";
   }
 
-  if (score >= 80) triggerSuccessConfetti();
   updateTeacherStats(score);
 
-  if (!appUrl) {
-    submissionStatus.textContent = "Evaluated successfully! (Google Sheet URL not configured).";
-    submissionStatus.style.color = "var(--warning-color)";
-    return;
-  }
+  const studentId = studentNameSelect.value;
 
-  submissionStatus.textContent = "Submitting score to teacher sheet...";
-  submissionStatus.style.color = "var(--info-color)";
+  submissionStatus.textContent = "Sending score and recording in report...";
+  
+  await sendScoreToNetlify(studentName, studentId, score);
 
-  const payload = {
-    studentName: studentName || "Unknown Student",
-    className: className || "General",
-    score: score,
-    assignment: assignmentTitleInput.value || "Reading Activity",
-    missedWords: missedWords.join(", "),
-    incorrectWords: incorrectWords.join(", ")
-  };
-
-  fetch(appUrl, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  }).then(() => {
-    submissionStatus.textContent = "Score submitted successfully to Google Sheets!";
-    submissionStatus.style.color = "var(--success-color)";
-  }).catch(err => {
-    submissionStatus.textContent = "Evaluated successfully! (Network error submitting to sheet).";
-    submissionStatus.style.color = "var(--danger-color)";
-  });
+  submissionStatus.innerHTML = `<i class="fa-solid fa-cloud-arrow-up" style="color: var(--success-color);"></i> Score successfully recorded in the report.`;
 }
 
-/* ------------------ INITIALIZATION ------------------ */
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
   loadClassesData();
-  loadStoriesData();
-  loadVoices();
 });
 </script>
 
