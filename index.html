@@ -1116,8 +1116,8 @@ async function uploadStudentRecording(studentName, studentId, score, audioVideoB
     throw new Error("Recorded recording is empty.");
   }
 
-  if (audioVideoBlob.size > 15 * 1024 * 1024) {
-    throw new Error("File size exceeds the 15MB upload limit for Apps Script stability.");
+  if (audioVideoBlob.size > 100 * 1024 * 1024) {
+    throw new Error("File size exceeds the 100MB upload limit for Apps Script stability.");
   }
 
   const urlParams = new URLSearchParams(window.location.search);
