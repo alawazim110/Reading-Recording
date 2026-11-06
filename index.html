@@ -2693,12 +2693,47 @@ function initializeSpeechRecognition() {
     liveSpeechDisplay.textContent = (recognizedText + ' ' + interimTranscript).trim() || "Listening to your reading...";
   };
 
-  instance.onerror = (event) => {
-    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      alert("Please allow microphone permissions in your browser or device settings.");
-    }
-  };
+ instance.onerror = (event) => {
 
+  console.error("SpeechRecognition Error:", event.error);
+
+  let msg = "";
+
+  switch (event.error) {
+
+    case "not-allowed":
+    case "service-not-allowed":
+      msg = "⚠️ Microphone permission denied. Please allow microphone access and try again.";
+      break;
+
+    case "audio-capture":
+      msg = "⚠️ No working microphone was detected on this device.";
+      break;
+
+    case "network":
+      msg = "⚠️ Speech recognition service connection failed. Please check your internet connection and try again.";
+      break;
+
+    case "no-speech":
+      msg = "⚠️ No speech was detected. Please speak clearly and try again.";
+      break;
+
+    case "aborted":
+      msg = "⚠️ Speech recognition was stopped unexpectedly. Please start recording again.";
+      break;
+
+    case "language-not-supported":
+      msg = "⚠️ The selected language is not supported on this device.";
+      break;
+
+    default:
+      msg = "⚠️ Speech recognition error: " + event.error;
+  }
+
+  alert(msg);
+
+  liveSpeechDisplay.textContent = msg;
+};
   instance.onend = () => {
     if (isRecording && !isRecPaused) {
       setTimeout(() => {
